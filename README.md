@@ -155,7 +155,7 @@ Semantic errors found. See samples/example.errors
 ## Documentation
 
 - The project report (`report/project-report.tex`) provides a detailed explanation of each compiler phase, implementation details, and alignment with the COOL specification. Compile it with a LaTeX editor (e.g., Overleaf) to generate `project-report.pdf`.
-- Refer to the [COOL Reference Manual](https://theory.stanford.edu/~aiken/publications/manuals/cool-manual.pdf) for language details.
+- Refer to the [COOL Reference Manual](https://theory.stanford.edu/~aiken/software/cool/cool-manual.pdf) for language details.
 
 
 ## Acknowledgments
