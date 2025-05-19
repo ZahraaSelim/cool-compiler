@@ -1,0 +1,34 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_A_out_a" {
+        label="A.out_a";
+        color=blue;
+    node0 [label="L_auto_0:\lt0 = load io\lt1 = \"A: Hello world\n\"\lt2 = call out_string(t1)\lreturn t2\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_B_out_b" {
+        label="B.out_b";
+        color=blue;
+    node0 [label="L_auto_1:\lt3 = load io\lt4 = \"B: Hello world\n\"\lt5 = call out_string(t4)\lreturn t5\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_C_out_c" {
+        label="C.out_c";
+        color=blue;
+    node0 [label="L_auto_2:\lt6 = \"C: Hello world\n\"\lt7 = call C.out_string(t6)\lreturn t7\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_D_out_d" {
+        label="D.out_d";
+        color=blue;
+    node0 [label="L_auto_3:\lt8 = \"D: Hello world\n\"\lt9 = call D.out_string(t8)\lreturn t9\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_4:\lt10 = call new A()\lt11 = call out_a()\lt12 = call new B()\lt13 = call out_b()\lt14 = call new C()\lt15 = call out_c()\lt16 = call new D()\lt17 = call out_d()\lt18 = \"Done.\n\"\lt19 = call Main.out_string(t18)\lreturn t19\l"];
+    node0 -> node0;
+    }
+}
+

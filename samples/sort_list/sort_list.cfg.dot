@@ -1,0 +1,182 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Nil_rev" {
+        label="Nil.rev";
+        color=blue;
+    node0 [label="L_auto_0:\lreturn self\l"];
+    }
+    subgraph "cluster_Nil_print_list" {
+        label="Nil.print_list";
+        color=blue;
+    node0 [label="L_auto_1:\lt49 = true\lreturn t49\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Nil_rcons" {
+        label="Nil.rcons";
+        color=blue;
+    node0 [label="L_auto_2:\lparam i\lt47 = call new Cons()\lt48 = call init(i, self)\lreturn t48\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Nil_insert" {
+        label="Nil.insert";
+        color=blue;
+    node0 [label="L_auto_3:\lparam i\lt46 = call Nil.rcons(i)\lreturn t46\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Nil_isNil" {
+        label="Nil.isNil";
+        color=blue;
+    node0 [label="L_auto_4:\lt45 = true\lreturn t45\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Nil_sort" {
+        label="Nil.sort";
+        color=blue;
+    node0 [label="L_auto_5:\lreturn self\l"];
+    }
+    subgraph "cluster_Cons_cdr" {
+        label="Cons.cdr";
+        color=blue;
+    node0 [label="L_auto_6:\lt15 = load xcdr\lreturn t15\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_init" {
+        label="Cons.init";
+        color=blue;
+    node0 [label="L_auto_7:\lparam hd\lparam tl\lstore hd -> xcar\lstore tl -> xcdr\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_rev" {
+        label="Cons.rev";
+        color=blue;
+    node0 [label="L_auto_8:\lt16 = load xcdr\lt17 = call rev()\lt18 = load xcar\lt19 = call rcons(t18)\lreturn t19\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_print_list" {
+        label="Cons.print_list";
+        color=blue;
+    node0 [label="L_auto_9:\lt39 = load xcar\lt40 = call Cons.out_int(t39)\lt41 = \"\n\"\lt42 = call Cons.out_string(t41)\lt43 = load xcdr\lt44 = call print_list()\lreturn t44\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_car" {
+        label="Cons.car";
+        color=blue;
+    node0 [label="L_auto_10:\lt14 = load xcar\lreturn t14\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_rcons" {
+        label="Cons.rcons";
+        color=blue;
+    node0 [label="L_auto_11:\lparam i\lt34 = call new Cons()\lt35 = load xcar\lt36 = load xcdr\lt37 = call rcons(i)\lt38 = call init(t35, t37)\lreturn t38\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_insert" {
+        label="Cons.insert";
+        color=blue;
+    node0 [label="L_auto_12:\lparam i\lt24 = load xcar\lt25 = i < t24\lif t25 goto L0\l"];
+    node1 [label="L_auto_13:\lgoto L1\l"];
+    node2 [label="L0:\lt26 = call new Cons()\lt27 = call init(i, self)\lt28 = t27\lgoto L2\l"];
+    node3 [label="L1:\lt29 = call new Cons()\lt30 = load xcar\lt31 = load xcdr\lt32 = call insert(i)\lt33 = call init(t30, t32)\lt28 = t33\l"];
+    node4 [label="L2:\lreturn t28\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_Cons_isNil" {
+        label="Cons.isNil";
+        color=blue;
+    node0 [label="L_auto_14:\lt13 = false\lreturn t13\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_sort" {
+        label="Cons.sort";
+        color=blue;
+    node0 [label="L_auto_15:\lt20 = load xcdr\lt21 = call sort()\lt22 = load xcar\lt23 = call insert(t22)\lreturn t23\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_cdr" {
+        label="List.cdr";
+        color=blue;
+    node0 [label="L_auto_16:\lt6 = call List.abort()\lt7 = call new List()\lreturn t7\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_rev" {
+        label="List.rev";
+        color=blue;
+    node0 [label="L_auto_17:\lt8 = call List.cdr()\lreturn t8\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_print_list" {
+        label="List.print_list";
+        color=blue;
+    node0 [label="L_auto_18:\lt12 = call List.abort()\lreturn t12\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_car" {
+        label="List.car";
+        color=blue;
+    node0 [label="L_auto_19:\lt4 = call List.abort()\lt5 = call new Int()\lreturn t5\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_rcons" {
+        label="List.rcons";
+        color=blue;
+    node0 [label="L_auto_20:\lparam i\lt11 = call List.cdr()\lreturn t11\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_insert" {
+        label="List.insert";
+        color=blue;
+    node0 [label="L_auto_21:\lparam i\lt10 = call List.cdr()\lreturn t10\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_isNil" {
+        label="List.isNil";
+        color=blue;
+    node0 [label="L_auto_22:\lt0 = call List.abort()\lt1 = true\lreturn t1\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_sort" {
+        label="List.sort";
+        color=blue;
+    node0 [label="L_auto_23:\lt9 = call List.cdr()\lreturn t9\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_cons" {
+        label="List.cons";
+        color=blue;
+    node0 [label="L_auto_24:\lparam hd\lt2 = call new Cons()\lnew_cell = t2\lt3 = call init(hd, self)\lreturn t3\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_iota" {
+        label="Main.iota";
+        color=blue;
+    node0 [label="L_auto_25:\lparam i\lt50 = call new Nil()\lstore t50 -> l\lt51 = 0\lj = t51\l"];
+    node1 [label="L3:\lt52 = j < i\lif t52 goto L4\l"];
+    node2 [label="L_auto_26:\lgoto L5\l"];
+    node3 [label="L4:\lt53 = call new Cons()\lt54 = load l\lt55 = call init(j, t54)\lstore t55 -> l\lt56 = 1\lt57 = j + t56\lj = t57\lgoto L3\l"];
+    node4 [label="L5:\lt58 = load l\lreturn t58\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node1 -> node1;
+    node1 -> node2;
+    node1 -> node3;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node0;
+    node3 -> node4;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_27:\lt59 = \"How many numbers to sort?\"\lt60 = call Main.out_string(t59)\lt61 = call Main.in_int()\lt62 = call Main.iota(t61)\lt63 = call rev()\lt64 = call sort()\lt65 = call print_list()\lreturn t65\l"];
+    node0 -> node0;
+    }
+}
+

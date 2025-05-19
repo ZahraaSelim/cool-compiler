@@ -1,0 +1,104 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_SumOp_optype" {
+        label="SumOp.optype";
+        color=blue;
+    node0 [label="L_auto_0:\lt2 = \" SumOp \"\lreturn t2\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_MulOp_optype" {
+        label="MulOp.optype";
+        color=blue;
+    node0 [label="L_auto_1:\lt3 = \" MulOp \"\lreturn t3\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_MulOp_operate" {
+        label="MulOp.operate";
+        color=blue;
+    node0 [label="L_auto_2:\lparam a\lparam b\lt4 = a * b\lreturn t4\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BinOp_optype" {
+        label="BinOp.optype";
+        color=blue;
+    node0 [label="L_auto_3:\lt1 = \" BinOp \"\lreturn t1\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BinOp_operate" {
+        label="BinOp.operate";
+        color=blue;
+    node0 [label="L_auto_4:\lparam a\lparam b\lt0 = a + b\lreturn t0\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_reduce" {
+        label="Main.reduce";
+        color=blue;
+    node0 [label="L_auto_5:\lparam result\lparam op\lparam l\lt21 = call get_head()\lt22 = call operate(result, t21)\lresult = t22\lt23 = call tail_is_empty()\lt24 = true\lt25 = t23 = t24\lif t25 goto L3\l"];
+    node1 [label="L_auto_6:\lgoto L4\l"];
+    node2 [label="L3:\lt26 = result\lgoto L5\l"];
+    node3 [label="L4:\lt27 = call get_tail()\lt28 = call Main.reduce(result, op, t27)\lt26 = t28\l"];
+    node4 [label="L5:\lreturn t26\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node2 -> node2;
+    node3 -> node3;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_7:\lt29 = call new MulOp()\lop = t29\lt30 = call new IntList()\ll = t30\lt31 = call new IO()\lio = t31\lt32 = 4\lt33 = call generate(t32)\ll = t33\lt34 = 1\lt35 = call reduce(t34, op, l)\lt36 = call out_int(t35)\lreturn t36\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_IntList_set_tail" {
+        label="IntList.set_tail";
+        color=blue;
+    node0 [label="L_auto_8:\lparam t\lstore t -> tail\lreturn t\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_IntList_tail_is_empty" {
+        label="IntList.tail_is_empty";
+        color=blue;
+    node0 [label="L_auto_9:\lt5 = load tail\lt6 = load empty_tail\lt7 = t5 = t6\lreturn t7\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_IntList_get_head" {
+        label="IntList.get_head";
+        color=blue;
+    node0 [label="L_auto_10:\lt8 = load head\lreturn t8\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_IntList_set_head" {
+        label="IntList.set_head";
+        color=blue;
+    node0 [label="L_auto_11:\lparam n\lstore n -> head\lreturn n\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_IntList_get_tail" {
+        label="IntList.get_tail";
+        color=blue;
+    node0 [label="L_auto_12:\lt9 = load tail\lreturn t9\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_IntList_generate" {
+        label="IntList.generate";
+        color=blue;
+    node0 [label="L_auto_13:\lparam n\lt10 = call new IntList()\ll = t10\lt11 = call set_head(n)\lt12 = 1\lt13 = n = t12\lif t13 goto L0\l"];
+    node1 [label="L_auto_14:\lgoto L1\l"];
+    node2 [label="L0:\lt14 = load empty_tail\lt15 = call set_tail(t14)\lt16 = t15\lgoto L2\l"];
+    node3 [label="L1:\lt17 = 1\lt18 = n - t17\lt19 = call IntList.generate(t18)\lt20 = call set_tail(t19)\lt16 = t20\l"];
+    node4 [label="L2:\lreturn l\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+}
+

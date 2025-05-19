@@ -1,0 +1,87 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Cons_head" {
+        label="Cons.head";
+        color=blue;
+    node0 [label="L_auto_0:\lt7 = load car\lreturn t7\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_init" {
+        label="Cons.init";
+        color=blue;
+    node0 [label="L_auto_1:\lparam i\lparam rest\lstore i -> car\lstore rest -> cdr\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_tail" {
+        label="Cons.tail";
+        color=blue;
+    node0 [label="L_auto_2:\lt8 = load cdr\lreturn t8\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_isNil" {
+        label="Cons.isNil";
+        color=blue;
+    node0 [label="L_auto_3:\lt6 = false\lreturn t6\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_head" {
+        label="List.head";
+        color=blue;
+    node0 [label="L_auto_4:\lt1 = call List.abort()\lt2 = 0\lreturn t2\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_tail" {
+        label="List.tail";
+        color=blue;
+    node0 [label="L_auto_5:\lt3 = call List.abort()\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_isNil" {
+        label="List.isNil";
+        color=blue;
+    node0 [label="L_auto_6:\lt0 = true\lreturn t0\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_List_cons" {
+        label="List.cons";
+        color=blue;
+    node0 [label="L_auto_7:\lparam i\lt4 = call new Cons()\lt5 = call init(i, self)\lreturn t5\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_print_list" {
+        label="Main.print_list";
+        color=blue;
+    node0 [label="L_auto_8:\lparam l\lt9 = call isNil()\lif t9 goto L0\l"];
+    node1 [label="L_auto_9:\lgoto L1\l"];
+    node2 [label="L0:\lt10 = \"\n\"\lt11 = call Main.out_string(t10)\lt12 = t11\lgoto L2\l"];
+    node3 [label="L1:\lt13 = call head()\lt14 = call Main.out_int(t13)\lt15 = \" \"\lt16 = call Main.out_string(t15)\lt17 = call tail()\lt18 = call Main.print_list(t17)\lt12 = t18\l"];
+    node4 [label="L2:\lreturn t12\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_10:\lt19 = call new List()\lt20 = 1\lt21 = call cons(t20)\lt22 = 2\lt23 = call cons(t22)\lt24 = 3\lt25 = call cons(t24)\lt26 = 4\lt27 = call cons(t26)\lt28 = 5\lt29 = call cons(t28)\lstore t29 -> mylist\l"];
+    node1 [label="L3:\lt30 = load mylist\lt31 = call isNil()\lt32 = not t31\lif t32 goto L4\l"];
+    node2 [label="L_auto_11:\lgoto L5\l"];
+    node3 [label="L4:\lt33 = load mylist\lt34 = call Main.print_list(t33)\lt35 = load mylist\lt36 = call tail()\lstore t36 -> mylist\lgoto L3\l"];
+    node4 [label="L5:\lreturn\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node1 -> node1;
+    node1 -> node2;
+    node1 -> node3;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node0;
+    }
+}
+

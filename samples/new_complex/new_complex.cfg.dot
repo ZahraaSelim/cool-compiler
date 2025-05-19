@@ -1,0 +1,117 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_0:\lt0 = call new Complex()\lt1 = 1\lt2 = 1\lt3 = call init(t1, t2)\lc = t3\lt4 = call reflect_X()\lt5 = call reflect_0()\lt6 = t4 = t5\lif t6 goto L0\l"];
+    node1 [label="L_auto_1:\lgoto L1\l"];
+    node2 [label="L0:\lt7 = \"=)\n\"\lt8 = call Main.out_string(t7)\lt9 = t8\lgoto L2\l"];
+    node3 [label="L1:\lt10 = \"=(\n\"\lt11 = call Main.out_string(t10)\lt9 = t11\l"];
+    node4 [label="L2:\lt12 = call reflect_X()\lt13 = call reflect_Y()\lt14 = call reflect_0()\lt15 = call equal(t14)\lif t15 goto L3\l"];
+    node5 [label="L_auto_2:\lgoto L4\l"];
+    node6 [label="L3:\lt16 = \"=)\n\"\lt17 = call Main.out_string(t16)\lt18 = t17\lgoto L5\l"];
+    node7 [label="L4:\lt19 = \"=(\n\"\lt20 = call Main.out_string(t19)\lt18 = t20\l"];
+    node8 [label="L5:\lreturn t18\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node4;
+    node4 -> node4;
+    node4 -> node6;
+    node4 -> node5;
+    node5 -> node5;
+    node5 -> node6;
+    node6 -> node6;
+    node6 -> node7;
+    node7 -> node7;
+    }
+    subgraph "cluster_Complex_equal" {
+        label="Complex.equal";
+        color=blue;
+    node0 [label="L_auto_3:\lparam d\lt55 = load x\lt56 = call x_value()\lt57 = t55 = t56\lif t57 goto L9\l"];
+    node1 [label="L_auto_4:\lgoto L10\l"];
+    node2 [label="L9:\lt58 = load y\lt59 = call y_value()\lt60 = t58 = t59\lif t60 goto L12\l"];
+    node3 [label="L_auto_5:\lgoto L13\l"];
+    node4 [label="L12:\lt61 = true\lt62 = t61\lgoto L14\l"];
+    node5 [label="L13:\lt63 = false\lt62 = t63\l"];
+    node6 [label="L14:\lt64 = t62\lgoto L11\l"];
+    node7 [label="L10:\lt65 = false\lt64 = t65\l"];
+    node8 [label="L11:\lreturn t64\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node6;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node4;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node4;
+    node4 -> node5;
+    node4 -> node4;
+    node5 -> node5;
+    node5 -> node7;
+    node6 -> node6;
+    node6 -> node7;
+    node7 -> node7;
+    }
+    subgraph "cluster_Complex_init" {
+        label="Complex.init";
+        color=blue;
+    node0 [label="L_auto_6:\lparam a\lparam b\lt21 = load x\lt22 = t21 = a\lt23 = load y\lt24 = t23 = b\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_y_value" {
+        label="Complex.y_value";
+        color=blue;
+    node0 [label="L_auto_7:\lt67 = load y\lreturn t67\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_print" {
+        label="Complex.print";
+        color=blue;
+    node0 [label="L_auto_8:\lt25 = load y\lt26 = 0\lt27 = t25 = t26\lif t27 goto L6\l"];
+    node1 [label="L_auto_9:\lgoto L7\l"];
+    node2 [label="L6:\lt28 = load x\lt29 = call Complex.out_int(t28)\lt30 = t29\lgoto L8\l"];
+    node3 [label="L7:\lt31 = load x\lt32 = call Complex.out_int(t31)\lt33 = \"+\"\lt34 = call out_string(t33)\lt35 = load y\lt36 = call out_int(t35)\lt37 = \"I\"\lt38 = call out_string(t37)\lt30 = t38\l"];
+    node4 [label="L8:\lreturn t30\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_Complex_reflect_Y" {
+        label="Complex.reflect_Y";
+        color=blue;
+    node0 [label="L_auto_10:\lt51 = load x\lt52 = load x\lt53 = ~ t52\lt54 = t51 = t53\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_reflect_X" {
+        label="Complex.reflect_X";
+        color=blue;
+    node0 [label="L_auto_11:\lt47 = load y\lt48 = load y\lt49 = ~ t48\lt50 = t47 = t49\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_reflect_0" {
+        label="Complex.reflect_0";
+        color=blue;
+    node0 [label="L_auto_12:\lt39 = load x\lt40 = load x\lt41 = ~ t40\lt42 = t39 = t41\lt43 = load y\lt44 = load y\lt45 = ~ t44\lt46 = t43 = t45\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_x_value" {
+        label="Complex.x_value";
+        color=blue;
+    node0 [label="L_auto_13:\lt66 = load x\lreturn t66\l"];
+    node0 -> node0;
+    }
+}
+

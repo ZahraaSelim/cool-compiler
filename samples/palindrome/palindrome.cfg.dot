@@ -1,0 +1,64 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Main_pal" {
+        label="Main.pal";
+        color=blue;
+    node0 [label="L_auto_0:\lparam s\lt0 = call length()\lt1 = 0\lt2 = t0 = t1\lif t2 goto L0\l"];
+    node1 [label="L_auto_1:\lgoto L1\l"];
+    node2 [label="L0:\lt3 = true\lt4 = t3\lgoto L2\l"];
+    node3 [label="L1:\lt5 = call length()\lt6 = 1\lt7 = t5 = t6\lif t7 goto L3\l"];
+    node4 [label="L_auto_2:\lgoto L4\l"];
+    node5 [label="L3:\lt8 = true\lt9 = t8\lgoto L5\l"];
+    node6 [label="L4:\lt10 = 0\lt11 = 1\lt12 = call substr(t10, t11)\lt13 = call length()\lt14 = 1\lt15 = t13 - t14\lt16 = 1\lt17 = call substr(t15, t16)\lt18 = t12 = t17\lif t18 goto L6\l"];
+    node7 [label="L_auto_3:\lgoto L7\l"];
+    node8 [label="L6:\lt19 = 1\lt20 = call length()\lt21 = 2\lt22 = t20 - t21\lt23 = call substr(t19, t22)\lt24 = call Main.pal(t23)\lt25 = t24\lgoto L8\l"];
+    node9 [label="L7:\lt26 = false\lt25 = t26\l"];
+    node10 [label="L8:\lt9 = t25\l"];
+    node11 [label="L5:\lt4 = t9\l"];
+    node12 [label="L2:\lreturn t4\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node10;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node5;
+    node3 -> node4;
+    node4 -> node4;
+    node4 -> node5;
+    node5 -> node9;
+    node5 -> node5;
+    node5 -> node6;
+    node6 -> node6;
+    node6 -> node8;
+    node6 -> node7;
+    node7 -> node7;
+    node7 -> node8;
+    node8 -> node8;
+    node8 -> node9;
+    node9 -> node9;
+    node9 -> node10;
+    node10 -> node10;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_4:\lt27 = 1\lt28 = ~ t27\lstore t28 -> i\lt29 = \"enter a string\n\"\lt30 = call Main.out_string(t29)\lt31 = call Main.in_string()\lt32 = call Main.pal(t31)\lif t32 goto L9\l"];
+    node1 [label="L_auto_5:\lgoto L10\l"];
+    node2 [label="L9:\lt33 = \"that was a palindrome\n\"\lt34 = call Main.out_string(t33)\lt35 = t34\lgoto L11\l"];
+    node3 [label="L10:\lt36 = \"that was not a palindrome\n\"\lt37 = call Main.out_string(t36)\lt35 = t37\l"];
+    node4 [label="L11:\lreturn t35\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+}
+
