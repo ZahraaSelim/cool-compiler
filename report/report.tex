@@ -1,0 +1,440 @@
+\documentclass[titlepage]{article}
+\usepackage[utf8]{inputenc}
+
+% Packages
+\usepackage{amsmath, amssymb, amsthm} % Math
+\usepackage{graphicx, float} % Images
+\usepackage[letterpaper, top=0.8in, bottom=0.8in, left=0.8in, right=0.8in,heightrounded]{geometry} % Page geometry
+\usepackage{listings} % Code listings
+\usepackage{caption} % Captions
+\usepackage{multicol} % Multi-column layout
+\usepackage{hyperref} % Hyperlinks
+\usepackage{xcolor} % Colored text
+
+% Configure listings for code
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    showspaces=false,
+    showstringspaces=false,
+    tabsize=2,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+}
+
+% Page formatting
+\setlength{\parindent}{0pt} % No paragraph indentation
+\setlength{\parskip}{0.8em} % Paragraph spacing
+
+% Title, author, and date
+\title{
+    CSE422 - Programming Languages and Compilers \\
+    COOL Compiler in Java \\
+    Project Report
+}
+\author{Zahraa Selim - 120210083}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+This project implements a compiler for the Classroom Object-Oriented Language (COOL), as specified in the COOL Reference Manual. COOL is a statically typed, object-oriented language designed for educational purposes, featuring classes, single inheritance, automatic memory management, and a rich expression-based syntax. The compiler, written in Java, processes COOL source files (`.cl`) and generates MIPS assembly code (`.asm`), along with visualizations of the parse tree, abstract syntax tree (AST), and control flow graph (CFG). This document details each phase of the compiler, explaining the features and functionalities implemented.
+
+The compiler pipeline consists of:
+\begin{itemize}
+    \item \textbf{Lexical Analysis}: Tokenizing COOL source code using ANTLR.
+    \item \textbf{Syntax Analysis}: Parsing tokens into a parse tree, ensuring syntactic correctness.
+    \item \textbf{AST Construction}: Building an abstract syntax tree from the parse tree.
+    \item \textbf{Semantic Analysis}: Performing type checking and validating program semantics.
+    \item \textbf{Intermediate Code Generation}: Generating Three-Address Code (TAC).
+    \item \textbf{Visualization}: Producing visualizations of parse trees, ASTs, and CFGs as PNG images.
+    \item \textbf{Optimization}: Applying optimizations to the TAC.
+    \item \textbf{Code Generation}: Translating optimized TAC to MIPS assembly.
+\end{itemize}
+
+Each phase is implemented as a modular component, ensuring maintainability and extensibility. The following sections describe each phase in detail, highlighting the implemented features and their alignment with the COOL specification.
+
+\section{Lexical Analysis}
+
+\subsection{COOL Lexical Structure}
+
+The lexer, implemented using ANTLR, tokenizes COOL source code according to the lexical structure defined in Section 10 of the COOL Reference Manual. It recognizes integers, identifiers, strings, comments, keywords, whitespace, and special notation.
+
+\subsubsection{Integers, Identifiers, and Special Notation}
+
+Integers are non-empty sequences of digits (0--9). Identifiers are categorized into object identifiers (starting with a lowercase letter) and type identifiers (starting with an uppercase letter), consisting of letters, digits, and underscores. The special identifiers \texttt{self} and \texttt{SELF\_TYPE} are handled explicitly.
+
+\begin{lstlisting}
+INT       : [0-9]+;
+ID        : [a-z][a-zA-Z0-9_]*;
+TYPE      : [A-Z][a-zA-Z0-9_]*;
+SELF      : 'self';
+SELF_TYPE : 'SELF_TYPE';
+\end{lstlisting}
+
+\subsubsection{Strings}
+
+Strings are enclosed in double quotes and may contain escape sequences (\texttt{\textbackslash b}, \texttt{\textbackslash t}, \texttt{\textbackslash n}, \texttt{\textbackslash f}). Unterminated strings and invalid characters (e.g., null or EOF) trigger error messages.
+
+\begin{lstlisting}
+STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)* '"';
+fragment STRING_CONTENT : ~["\\\n\r\u0000];
+fragment ESCAPE_SEQUENCE : '\\' (['"\\] | 'b' | 't' | 'n' | 'f');
+UNTERMINATED_STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)*  ('\n' | EOF) { 
+    System.err.println("Error: Unterminated string detected!"); 
+};
+\end{lstlisting}
+
+\subsubsection{Comments}
+
+COOL supports single-line comments (starting with \texttt{--}) and nested multi-line comments (enclosed in \texttt{(*} and \texttt{*)}). Both are skipped during tokenization.
+
+\begin{lstlisting}
+SINGLECOMMENT : '--' ~[\r\n]* -> skip;
+MULTICOMMENT  : '(*' .*? '*)' -> skip;
+\end{lstlisting}
+
+\subsubsection{Keywords}
+
+COOL keywords (e.g., \texttt{class}, \texttt{if}, \texttt{while}) are case-insensitive, except for \texttt{true} and \texttt{false}, which must start with lowercase \texttt{t} or \texttt{f}. The lexer uses fragments to handle case insensitivity.
+
+\begin{lstlisting}
+CLASS : C L A S S;
+ELSE  : E L S E;
+TRUE  : 't' R U E;
+FALSE : 'f' A L S E;
+fragment A : [aA];
+fragment B : [bB];
+// ... other fragments
+\end{lstlisting}
+
+\subsubsection{Whitespace}
+
+Whitespace includes spaces, tabs, newlines, form feeds, carriage returns, and vertical tabs, all skipped during tokenization.
+
+\begin{lstlisting}
+WS : [ \t\r\n\f\u000B]+ -> skip;
+\end{lstlisting}
+
+\subsubsection{Operators and Punctuation}
+
+Operators and punctuation (e.g., \texttt{+}, \texttt{<-}, \texttt{.}) are defined as tokens to support the separated lexer/parser grammar.
+
+\begin{lstlisting}
+PLUS      : '+' ;
+ARROW     : '<-';
+DOT       : '.' ;
+// ... other operators
+\end{lstlisting}
+
+\subsection{Implementation Details}
+
+The lexer is defined in \texttt{CoolLexer.g4}, which generates a Java lexer class using ANTLR. It handles all lexical elements specified in the COOL manual, including error reporting for invalid strings. The lexer integrates with the parser via a token stream, ensuring robust tokenization for downstream phases.
+
+\section{Syntax Analysis}
+
+\subsection{COOL Syntax}
+
+The parser, implemented using ANTLR, constructs a parse tree from the token stream, enforcing the syntax defined in Section 11 of the COOL Reference Manual. COOL's syntax includes class definitions, features (attributes and methods), expressions, and control structures.
+
+\subsection{ANTLR Parser Grammar}
+
+The parser grammar, defined in \texttt{CoolParser.g4}, specifies the structure of COOL programs. A program consists of one or more class definitions, each containing features. Expressions cover a wide range of constructs, including dispatches, conditionals, loops, and let bindings.
+
+\begin{lstlisting}
+program
+    : class+                                                                                               
+    ;                                                                                                      
+                                                                                                           
+class
+    : CLASS TYPE (INHERITS TYPE)? LBRACE feature* RBRACE SEMICOLON                                         
+    ;                                                                                                      
+                                                                                                           
+feature
+    : ID LPAREN (formal (COMMA formal)*)? RPAREN COLON TYPE LBRACE expr RBRACE SEMICOLON
+    # Method         
+    | formal (ARROW expr)? SEMICOLON
+    # Attribute      
+    ;                                                                                                      
+                                                                                                           
+expr
+    : expr (AT TYPE)? DOT ID LPAREN exprList? RPAREN                 # Dispatch                            
+    | TILDE expr                                                     # Negation                            
+    | ISVOID expr                                                    # Isvoid                              
+    | expr TIMES expr                                                # Multiplication                      
+    | ID ARROW expr                                                  # Assignment                          
+    | IF expr THEN expr ELSE expr FI                                 # IfElse                              
+    | LET letDecl (COMMA letDecl)* IN expr                           # Let                                 
+    | NEW TYPE                                                       # New                                 
+    | ID                                                             # Identifier                          
+    | INT                                                            # Integer                             
+    | TRUE                                                           # True                                
+    // ... other expression rules
+\end{lstlisting}
+
+\subsection{Precedence and Associativity}
+
+The parser respects the operator precedence defined in the COOL manual (Section 11.1), from highest to lowest: \texttt{.}, \texttt{@}, \texttt{\textasciitilde}, \texttt{isvoid}, \texttt{* /}, \texttt{+ -}, \texttt{<= < =}, \texttt{not}, \texttt{<-}. All binary operators are left-associative, except assignment (\texttt{<-}), which is right-associative, and comparisons, which are non-associative.
+
+\subsection{Implementation Details}
+
+The parser uses a \texttt{BailErrorStrategy} to halt on the first syntax error, ensuring immediate feedback for invalid programs. The generated parse tree serves as input to the AST construction phase, preserving the syntactic structure for semantic analysis.
+
+\section{Abstract Syntax Tree (AST) Construction}
+
+\subsection{Purpose}
+
+The AST construction phase transforms the parse tree into an abstract syntax tree, representing the program's structure in a form suitable for semantic analysis. The AST abstracts away syntactic details, focusing on the program's logical components (classes, features, expressions).
+
+\subsection{Implementation}
+
+The \texttt{ASTBuilder} class, a visitor over the parse tree, constructs AST nodes defined in the \texttt{ast} package. Key node types include:
+
+\begin{itemize}
+    \item \textbf{ProgramNode}: Represents the entire program, containing a list of classes.
+    \item \textbf{ClassNode}: Represents a class with its name, optional parent, and features.
+    \item \textbf{FeatureNode}: Base class for attributes (\texttt{AttributeNode}) and methods (\texttt{MethodNode}).
+    \item \textbf{ExpressionNode}: Base class for expressions (e.g., \texttt{BinaryExpressionNode}, \texttt{IfNode}, \texttt{NewNode}).
+\end{itemize}
+
+\begin{lstlisting}
+// Example: ASTBuilder visiting a class
+public class ASTBuilder extends CoolParserBaseVisitor<Node> {
+    @Override
+    public Node visitClass(CoolParser.ClassContext ctx) {
+        String className = ctx.TYPE(0).getText();
+        String parentName = ctx.INHERITS() != null ? ctx.TYPE(1).getText() : null;
+        List<FeatureNode> features = new ArrayList<>();
+        for (CoolParser.FeatureContext featureCtx : ctx.feature()) {
+            features.add((FeatureNode) visit(featureCtx));
+        }
+        return new ClassNode(className, parentName, features);
+    }
+}
+\end{lstlisting}
+
+\subsection{Features}
+
+The AST supports all COOL constructs, including:
+- Class definitions with single inheritance.
+- Attributes with optional initialization.
+- Methods with formal parameters and return types.
+- Expressions such as dispatches, conditionals, loops, let bindings, and case statements.
+
+The AST is designed for extensibility, with a clear hierarchy of node types facilitating semantic analysis and code generation.
+
+\section{Semantic Analysis}
+
+\subsection{Purpose}
+
+Semantic analysis ensures the program adheres to COOL's type system and semantic rules (Sections 4, 12 of the manual). It performs type checking, validates inheritance, and detects errors such as undefined types or type mismatches.
+
+\subsection{Implementation}
+
+The \texttt{SemanticAnalyzer} class performs semantic analysis by traversing the AST. It maintains:
+
+\begin{itemize}
+    \item \textbf{ClassTable}: Maps class names to their definitions, including parent classes and features.
+    \item \textbf{SymbolTable}: Tracks variable scopes and their types, supporting nested scopes for let and method bodies.
+\end{itemize}
+
+\begin{lstlisting}
+public class SemanticAnalyzer {
+    private ClassTable classTable;
+    private SymbolTable symbolTable;
+
+    public List<String> analyze(ProgramNode program) {
+        List<String> errors = new ArrayList<>();
+        buildClassTable(program, errors);
+        checkInheritance(errors);
+        checkFeatures(errors);
+        return errors;
+    }
+}
+\end{lstlisting}
+
+\subsection{Key Features}
+
+- \textbf{Type Checking}: Implements the conformance relation (\texttt{C $\leq$ P}) and type rules for all expressions (Section 12.2). Handles \texttt{SELF\_TYPE} for flexible typing in inherited classes.
+- \textbf{Inheritance Validation}: Ensures no cycles in the inheritance graph and that parent classes are defined (Section 3.2).
+- \textbf{Method Redefinition}: Enforces that overridden methods have identical signatures (Section 6).
+- \textbf{Error Reporting}: Collects and reports semantic errors (e.g., type mismatches, undefined identifiers) to an error file.
+
+The analyzer supports COOL's type safety guarantee, ensuring no runtime type errors occur (Section 4.2).
+
+\section{Intermediate Code Generation}
+
+\subsection{Purpose}
+
+The intermediate code generation phase translates the AST into Three-Address Code (TAC), a platform-independent representation suitable for optimization and code generation.
+
+\subsection{Implementation}
+
+The \texttt{TACGenerator} class generates TAC by visiting AST nodes. The TAC representation includes instructions like assignments, binary operations, and control flow statements.
+
+\begin{lstlisting}
+public class TACGenerator {
+    private ClassTable classTable;
+    private SymbolTable symbolTable;
+    private int tempCounter;
+
+    public TACProgram generate(ProgramNode program) {
+        TACProgram tacProgram = new TACProgram();
+        for (ClassNode classNode : program.getClasses()) {
+            for (FeatureNode feature : classNode.getFeatures()) {
+                if (feature instanceof MethodNode) {
+                    tacProgram.addMethod(generateMethod((MethodNode) feature));
+                }
+            }
+        }
+        return tacProgram;
+    }
+}
+\end{lstlisting}
+
+\subsection{Features}
+
+- Generates TAC for all expression types, including arithmetic, conditionals, loops, and dispatches.
+- Manages temporary variables for intermediate results.
+- Preserves method and class structure, facilitating CFG visualization and optimization.
+
+\section{Visualization}
+
+\subsection{Purpose}
+
+The visualization phase generates graphical representations of the parse tree, AST, and CFG, aiding in debugging and understanding the compiler's output. Visualizations are output as PNG images, converted from Graphviz `.dot` files.
+
+\subsection{Implementation}
+
+Three visualizer classes handle different aspects:
+
+\begin{itemize}
+    \item \textbf{ParseTreeVisualizer}: Generates a `.dot` file for the parse tree using ANTLR's parse tree structure.
+    \item \textbf{ASTVisualizer}: Traverses the AST to produce a `.dot` file representing the abstract syntax.
+    \item \textbf{CFGVisualizer}: Constructs a control flow graph from the TAC, outputting a `.dot` file.
+\end{itemize}
+
+The \texttt{DotToImageConverter} class converts `.dot` files to PNG images using Graphviz's \texttt{dot} command.
+
+\begin{lstlisting}
+public class DotToImageConverter {
+    public static void convertToPng(String dotFilePath, String outputPngPath) {
+        ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", dotFilePath, "-o", outputPngPath);
+        Process process = pb.start();
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new IOException("Graphviz dot command failed");
+        }
+    }
+}
+\end{lstlisting}
+
+\subsection{Features}
+
+- Produces PNG images for parse trees, ASTs, and CFGs, stored in the \texttt{output} directory.
+- Supports visualization of complex program structures, including nested expressions and control flow.
+- Integrates seamlessly with the compiler pipeline, invoked after each relevant phase.
+
+\section{Optimization}
+
+\subsection{Purpose}
+
+The optimization phase improves the TAC to enhance the efficiency of the generated code, focusing on reducing instruction count and improving runtime performance.
+
+\subsection{Implementation}
+
+The \texttt{ProgramOptimizer} class applies optimizations to the TAC program, such as constant folding and dead code elimination.
+
+\begin{lstlisting}
+public class ProgramOptimizer {
+    public TACProgram optimize(TACProgram program) {
+        TACProgram optimized = new TACProgram();
+        for (TACMethod method : program.getMethods()) {
+            optimized.addMethod(optimizeMethod(method));
+        }
+        return optimized;
+    }
+}
+\end{lstlisting}
+
+\subsection{Features}
+
+- Implements basic optimizations (e.g., constant folding, removing unreachable code).
+- Preserves program semantics, ensuring correctness.
+- Outputs optimized TAC to a separate file (e.g., \texttt{program.opt.tac}).
+
+\section{Code Generation}
+
+\subsection{Purpose}
+
+The code generation phase translates optimized TAC into MIPS assembly code, executable on a MIPS simulator like SPIM (Section 2 of the manual).
+
+\subsection{Implementation}
+
+The \texttt{CodeGenerator} class converts TAC instructions into MIPS assembly, leveraging the class table for method dispatch and object layout.
+
+\begin{lstlisting}
+public class CodeGenerator {
+    private ClassTable classTable;
+
+    public AssemblyProgram generate(TACProgram tacProgram) {
+        AssemblyProgram asmProgram = new AssemblyProgram();
+        for (TACMethod method : tacProgram.getMethods()) {
+            asmProgram.addFunction(generateFunction(method));
+        }
+        return asmProgram;
+    }
+}
+\end{lstlisting}
+
+\subsection{Features}
+
+- Generates MIPS assembly for all TAC instructions, including arithmetic, control flow, and method calls.
+- Supports COOL's object model, including attribute initialization and method dispatch.
+- Outputs assembly to \texttt{.asm} files, compatible with SPIM.
+
+\section{Main Workflow}
+
+\subsection{Implementation}
+
+The \texttt{Main} class orchestrates the compiler pipeline, processing all \texttt{.cl} files in the \texttt{input} directory and producing outputs in the \texttt{output} directory.
+
+\begin{lstlisting}
+public class Main {
+    public static void main(String[] args) {
+        Path inputDir = Paths.get("input");
+        Path outputDir = Paths.get("output");
+        // Reset output directory
+        Files.createDirectories(outputDir);
+        // Process each .cl file
+        for (Path inputFile : getCoolFiles(inputDir)) {
+            CharStream input = CharStreams.fromPath(inputFile);
+            CoolLexer lexer = new CoolLexer(input);
+            CoolParser parser = new CoolParser(new CommonTokenStream(lexer));
+            ParseTree tree = parser.program();
+            // Generate visualizations, AST, TAC, etc.
+        }
+    }
+}
+\end{lstlisting}
+
+\subsection{Features}
+
+- Processes multiple input files, generating separate outputs for each.
+- Handles errors gracefully, logging issues to \texttt{.errors} files.
+- Integrates all compiler phases, ensuring a cohesive workflow.
+
+\section{Conclusion}
+
+This COOL compiler implements a complete pipeline for compiling COOL programs into MIPS assembly, with robust support for lexical analysis, syntax analysis, semantic checking, intermediate code generation, visualization, optimization, and code generation. The visualization feature, enhanced by automatic conversion of `.dot` files to PNG images, provides valuable insights into the compilation process. The implementation adheres closely to the COOL Reference Manual, ensuring correctness and type safety while offering extensibility for future enhancements.
+
+\end{document}
