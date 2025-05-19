@@ -17,7 +17,7 @@
 
 % Configure listings for code
 \lstset{
-    basicstyle=\ttfamily\scriptsize, % Smaller font for listings
+    basicstyle=\ttfamily\small, % Consistent font size
     breaklines=true,
     frame=single,
     numbers=left,
@@ -61,49 +61,59 @@
 \label{sec:introduction}
 
 \subsection{Purpose}
-The Classroom Object-Oriented Language (COOL) is a statically typed, object-oriented language designed for educational purposes, as outlined in the COOL Reference Manual~\cite{cool_manual}. This project implements a compiler in Java that translates COOL source files (\texttt{.cl}) into MIPS assembly code (\texttt{.asm}) executable on the SPIM simulator. Beyond code generation, the compiler produces visualizations (parse trees, abstract syntax trees, and control flow graphs) to aid debugging and understanding. This report provides a comprehensive overview of the compiler's design, implementation, and features, detailing each phase of the compilation process.
+The Classroom Object-Oriented Language (COOL) is a statically typed, object-oriented language designed for educational purposes, as detailed in the COOL Reference Manual~\cite{cool_manual}. This project implements a compiler in Java that translates COOL source files (\texttt{.cl}) into MIPS assembly code (\texttt{.asm}) executable on the SPIM simulator. The compiler also generates visualizations, including parse trees, abstract syntax trees (ASTs), and control flow graphs (CFGs), to facilitate debugging and learning. This report provides a comprehensive overview of the compiler's design, implementation, and features across its pipeline.
 
 \subsection{Background}
-COOL supports classes, single inheritance, automatic memory management, and a rich expression-based syntax (Sections 3--7~\cite{cool_manual}). Its educational design emphasizes type safety, object-oriented programming, and compiler construction principles. The compiler pipeline mirrors a traditional compiler, with modular phases that handle lexical analysis, parsing, semantic checking, intermediate code generation, optimization, and final code generation. Visualizations enhance the ability to inspect intermediate representations, making the compiler a valuable learning tool.
+COOL supports classes, single inheritance, automatic memory management, and a rich expression-based syntax (Sections 3--7~\cite{cool_manual}). Its design emphasizes type safety, object-oriented programming, and compiler construction principles. The compiler pipeline includes modular phases for lexical analysis, syntax analysis, semantic checking, intermediate code generation, optimization, and code generation, with visualizations to inspect intermediate representations.
 
-The pipeline includes:
+The pipeline comprises:
 \begin{itemize}[leftmargin=*]
     \item \textbf{Lexical Analysis}: Converts source code into tokens using ANTLR.
     \item \textbf{Syntax Analysis}: Builds a parse tree to enforce syntactic rules.
-    \item \textbf{AST Construction}: Creates an abstract syntax tree for semantic analysis.
+    \item \textbf{AST Construction}: Creates an AST for semantic analysis.
     \item \textbf{Semantic Analysis}: Ensures type safety and semantic correctness.
     \item \textbf{Intermediate Code Generation}: Produces Three-Address Code (TAC).
     \item \textbf{Visualization}: Generates parse tree, AST, and CFG images.
-    \item \textbf{Optimization}: Improves TAC efficiency.
+    \item \textbf{Optimization}: Enhances TAC efficiency.
     \item \textbf{Code Generation}: Translates TAC to MIPS assembly.
 \end{itemize}
 
 \subsection{Implementation}
-The compiler is implemented in Java, leveraging ANTLR 4 for lexical and syntax analysis, and custom Java classes for subsequent phases. Each phase is encapsulated in dedicated packages (e.g., \texttt{ast}, \texttt{tac}, \texttt{visualization}), promoting modularity and maintainability. The main workflow in \texttt{Main.java} orchestrates the pipeline, processing multiple \texttt{.cl} files and producing corresponding outputs.
+The compiler is implemented in Java, using ANTLR 4 for lexical and syntax analysis and custom Java classes for other phases. Phases are organized into packages (e.g., \texttt{ast}, \texttt{tac}, \texttt{visualization}) for modularity. The main workflow in \texttt{Main.java} orchestrates the pipeline, processing multiple \texttt{. Cardinality (.cl)} files and generating corresponding outputs.
 
 \subsection{Features}
 \begin{itemize}[leftmargin=*]
     \item \textbf{Type Safety}: Enforces COOL's static typing rules (Section 4).
-    \item \textbf{Object-Oriented Support}: Handles classes, inheritance, and dispatch (Sections 3, 7.4).
+    \item \textbf{Object-Oriented Support}: Supports classes, inheritance, and dispatch (Sections 3, 7.4).
     \item \textbf{Visualizations}: Produces PNG images for debugging.
     \item \textbf{SPIM Compatibility}: Generates executable MIPS code.
-    \item \textbf{Modularity}: Allows easy extension and maintenance.
+    \item \textbf{Modularity}: Facilitates extension and maintenance.
 \end{itemize}
+
+\subsection{Example}
+The following COOL program is used throughout this report to illustrate each phase:
+\begin{lstlisting}
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
+\end{lstlisting}
 
 \section{Lexical Analysis}
 \label{sec:lexical}
 
 \subsection{Purpose}
-Lexical analysis transforms COOL source code into a stream of tokens, as specified in Section 10 of the COOL Reference Manual~\cite{cool_manual}. This phase is critical as it simplifies subsequent parsing by breaking the input into meaningful units like keywords, identifiers, and operators. The lexer must handle COOL's lexical rules, including case sensitivity, nested comments, and error conditions like unterminated strings.
+Lexical analysis converts COOL source code into a token stream, as specified in Section 10~\cite{cool_manual}. This phase simplifies parsing by breaking input into units like keywords, identifiers, and operators, handling COOL's lexical rules, including case sensitivity and nested comments.
 
 \subsection{Background}
-COOL's lexical structure includes integers, identifiers, strings, comments, keywords, whitespace, and special symbols. The lexer, implemented in \texttt{CoolLexer.g4} using ANTLR 4, generates a Java lexer class that produces tokens for the parser. ANTLR was chosen for its robust grammar definition language and automatic error handling, which streamline lexer development. Challenges include handling case-insensitive keywords (except \texttt{true}/\texttt{false}) and nested multi-line comments, which require careful rule design.
+COOL's lexical structure includes integers, identifiers, strings, comments, keywords, whitespace, and symbols. The lexer, implemented in \texttt{CoolLexer.g4} using ANTLR 4, generates a Java lexer class. ANTLR's robust grammar language and error handling streamline development. Challenges include case-insensitive keywords (except \texttt{true}/\texttt{false}) and nested comments.
 
 \subsection{Lexical Structure}
-
 \subsubsection{Integers and Identifiers}
-Integers are non-empty digit sequences (0--9) without leading zeros, except for 0 (Section 10.1). Identifiers include object identifiers (lowercase initial, e.g., \texttt{xcar}) and type identifiers (uppercase initial, e.g., \texttt{Cons}), with special identifiers \texttt{self} and \texttt{SELF\_TYPE}. The lexer rules in \texttt{CoolLexer.g4} are:
-
+Integers are non-empty digit sequences (0--9) without leading zeros, except for 0 (Section 10.1). Identifiers include object identifiers (lowercase initial, e.g., \texttt{xcar}) and type identifiers (uppercase initial, e.g., \texttt{Cons}). Lexer rules are:
 \begin{lstlisting}
 INT       : [0-9]+ ;
 ID        : [a-z][a-zA-Z0-9_]* ;
@@ -112,13 +122,10 @@ SELF      : 'self' ;
 SELF_TYPE : 'SELF_TYPE' ;
 \end{lstlisting}
 
-These rules ensure integers exclude invalid formats (e.g., \texttt{0123}) and identifiers match COOL's naming conventions.
-
 \subsubsection{Strings}
-Strings (Section 10.2) are double-quoted ASCII sequences supporting escape sequences (\texttt{\textbackslash n}, \texttt{\textbackslash t}) and limited to 1024 characters. Unterminated strings trigger errors. The lexer rules handle content and errors:
-
+Strings (Section 10.2) are double-quoted ASCII sequences with escape sequences (\texttt{\textbackslash n}, \texttt{\textbackslash t}) and a 1024-character limit. Unterminated strings trigger errors:
 \begin{lstlisting}
-STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)* '"' ;
+STRING  STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)* '"' ;
 fragment STRING_CONTENT : ~["\\\n\r] ;
 fragment ESCAPE_SEQUENCE : '\\' (['"\\] | 'b' | 't' | 'n' | 'f') ;
 UNTERMINATED_STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)* ('\n' | EOF) {
@@ -126,516 +133,956 @@ UNTERMINATED_STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)* ('\n' | EOF) {
 } ;
 \end{lstlisting}
 
-The error rule ensures user-friendly diagnostics, a critical feature for educational use.
-
 \subsubsection{Comments}
-COOL supports single-line (\texttt{--}) and nested multi-line (\texttt{(* *)}) comments, skipped during tokenization (Section 10.3). The lexer uses non-greedy matching for nested comments:
-
+COOL supports single-line (\texttt{--}) and nested multi-line (\texttt{(* *)}) comments (Section 10.3), skipped during tokenization:
 \begin{lstlisting}
 SINGLECOMMENT : '--' ~[\r\n]* -> skip ;
 MULTICOMMENT  : '(*' .*? '*)' -> skip ;
 \end{lstlisting}
 
-Non-greedy matching (\texttt{.*?}) ensures proper nesting, a challenge resolved by leveraging ANTLR's parsing capabilities.
-
 \subsubsection{Keywords}
-Keywords (e.g., \texttt{class}, \texttt{if}) are case-insensitive, except \texttt{true} and \texttt{false}, which require lowercase initials (Section 10.4). Fragments in \texttt{CoolLexer.g4} handle case insensitivity:
-
+Keywords (e.g., \texttt{class}, \texttt{if}) are case-insensitive, except \texttt{true} and \texttt{false} (Section 10.4):
 \begin{lstlisting}
 CLASS : C L A S S ;
 TRUE  : 't' R U E ;
 FALSE : 'f' A L S E ;
 fragment C : [cC] ;
 fragment L : [lL] ;
-// ... other fragments
 \end{lstlisting}
 
-This approach avoids duplicating rules for each case variation, improving maintainability.
-
-\subsubsection{Whitespace and Operators}
-Whitespace (spaces, tabs, newlines) is ignored (Section 10.5), and operators (e.g., \texttt{+}, \texttt{<-}) are tokenized individually:
-
+\subsubsection{Whitespace}
+Whitespace (spaces, tabs, newlines, etc.) is ignored (Section 10.5):
 \begin{lstlisting}
 WS : [ \t\r\n\f\u000B]+ -> skip ;
-PLUS  : '+' ;
-ARROW : '<-' ;
-DOT   : '.' ;
+\end{lstlisting}
+
+\subsubsection{Operators and Punctuation}
+Operators and punctuation (e.g., \texttt{+}, \texttt{<-}, \texttt{.}) are defined as tokens (Section 10.6):
+\begin{lstlisting}
+PLUS      : '+' ;
+MINUS     : '-' ;
+TIMES     : '*' ;
+DIVIDE    : '/' ;
+TILDE     : '~' ;
+LT        : '<' ;
+LEQ       : '<=' ;
+EQ        : '=' ;
+LPAREN    : '(' ;
+RPAREN    : ')' ;
+LBRACE    : '{' ;
+RBRACE    : '}' ;
+COLON     : ':' ;
+COMMA     : ',' ;
+ARROW     : '<-' ;
+DOT       : '.' ;
+SEMICOLON : ';' ;
+AT        : '@' ;
+CASEASSIGN: '=>' ;
 \end{lstlisting}
 
 \subsection{Implementation}
-The lexer, defined in \texttt{CoolLexer.g4}, produces tokens integrated with the parser via a token stream. ANTLR generates a Java class (\texttt{CoolLexer.java}) that processes input character by character, applying the defined rules. Design decisions include:
+The lexer, defined in \texttt{CoolLexer.g4}, generates a Java lexer class integrated with the parser. Key features include:
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Error Handling}: Custom error messages for unterminated strings enhance usability.
-    \item \textbf{Case Insensitivity}: Fragments reduce rule complexity for keywords.
-    \item \textbf{Nested Comments}: Non-greedy matching ensures correct parsing, a non-trivial task due to potential nesting depth.
-    \item \textbf{Performance}: Skipping whitespace and comments at the lexer level reduces parser workload.
-\end{itemize}
-
-Challenges included ensuring \texttt{true}/\texttt{false} case sensitivity and handling edge cases like empty strings or invalid escape sequences, resolved through rigorous testing against COOL's specification.
-
-\subsection{Features}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Comprehensive Tokenization}: Supports all COOL lexical elements.
-    \item \textbf{Error Reporting}: Detects and reports unterminated strings.
-    \item \textbf{Efficiency}: Skips irrelevant tokens (whitespace, comments).
-    \item \textbf{Integration}: Seamlessly feeds tokens to the parser.
+    \item \textbf{Error Handling}: Detects unterminated strings with informative messages.
+    \item \textbf{Case Insensitivity}: Uses fragments for keyword matching.
+    \item \textbf{Nested Comments}: Handles nesting with non-greedy matching.
+    \item \textbf{Token Stream}: Produces tokens for syntax analysis.
 \end{itemize}
 
 \subsection{Example}
-For the input:
-\begin{lstlisting}
-class Main {
-    main() : Object {
-        let x : Int <    \item 42 in x + 1
-    };
-};
-\end{lstlisting}
-the lexer produces tokens like \texttt{CLASS}, \texttt{TYPE(Main)}, \texttt{ID(main)}, \texttt{LET}, \texttt{ID(x)}, \texttt{INT(42)}, \texttt{PLUS}, \texttt{INT(1)}, reflecting COOL's lexical structure.
+For the sample program, the lexer produces tokens like \texttt{CLASS}, \texttt{TYPE(Main)}, \texttt{ID(x)}, \texttt{INT(42)}, \texttt{PLUS}, reflecting COOL's lexical rules.
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ANTLR Choice}: Selected for robust grammar support and error handling.
+    \item \textbf{Error Reporting}: Prioritized user-friendly diagnostics for educational use.
+    \item \textbf{Modularity}: Separated lexer rules for maintainability.
+\end{itemize}
 
 \section{Syntax Analysis}
 \label{sec:syntax}
 
 \subsection{Purpose}
-Syntax analysis constructs a parse tree from the token stream, ensuring the program adheres to COOL's grammar (Section 11~\cite{cool_manual}). This phase validates the syntactic structure, detecting errors like missing semicolons or malformed expressions before semantic analysis.
+Syntax analysis constructs a parse tree from the token stream, ensuring adherence to COOL's grammar as defined in Section 11~\cite{cool_manual}. It detects syntactic errors, such as missing semicolons or malformed expressions, before semantic analysis.
 
 \subsection{Background}
-COOL's grammar defines programs as class sequences, with classes containing attributes and methods, and expressions supporting complex constructs like dispatches and conditionals. The parser, implemented in \texttt{CoolParser.g4} using ANTLR 4, generates a labeled parse tree for AST construction. ANTLR was chosen for its ability to handle complex grammars and generate robust parsers. Challenges include encoding operator precedence and handling COOL's unique constructs like \texttt{SELF\_TYPE}.
+COOL's grammar specifies programs as sequences of class definitions, each containing attributes, methods, and a rich set of expressions (Sections 3, 7, 11~\cite{cool_manual}). The parser, implemented in \texttt{CoolParser.g4} using ANTLR 4, generates a labeled parse tree for subsequent AST construction. Key challenges include encoding operator precedence for expressions, supporting \texttt{SELF\_TYPE} in type annotations, and handling nested constructs like let and case expressions.
 
 \subsection{Syntax Structure}
+The grammar, defined in \texttt{CoolParser.g4}, outlines the syntactic structure of COOL programs. Below are the key rules, with labels for parse tree nodes:
 
 \subsubsection{Program and Classes}
-A COOL program is one or more class definitions (Section 3), each with optional inheritance and features. The grammar in \texttt{CoolParser.g4} defines:
-
+A program consists of one or more class definitions (Section 3):
 \begin{lstlisting}
 program : class+ ;
 class   : CLASS TYPE (INHERITS TYPE)? LBRACE feature* RBRACE SEMICOLON ;
 \end{lstlisting}
 
-This structure ensures classes are well-formed and supports inheritance.
-
 \subsubsection{Features}
-Attributes and methods (Section 3.1) are defined as:
-
+Class features are either methods or attributes (Section 3.1):
 \begin{lstlisting}
-feature : ID LPAREN (formal (COMMA formal)*)? RPAREN COLON (TYPE | SELF_TYPE) LBRACE expr RBRACE SEMICOLON  # Method
-        | ID COLON (TYPE | SELF_TYPE) (ARROW expr)? SEMICOLON                                        # Attribute ;
-formal  : ID COLON (TYPE | SELF_TYPE) ;
+feature
+    : ID LPAREN (formal (COMMA formal)*)? RPAREN COLON (TYPE | SELF_TYPE) LBRACE expr RBRACE SEMICOLON  # Method
+    | ID COLON (TYPE | SELF_TYPE) (ARROW expr)? SEMICOLON                                               # Attribute
+    ;
+formal
+    : ID COLON (TYPE | SELF_TYPE)
+    ;
 \end{lstlisting}
-
-Attributes may include initialization, and methods support multiple parameters.
+Methods include parameter lists and a body expression, while attributes may have optional initializers.
 
 \subsubsection{Expressions}
-Expressions (Section 7) include dispatches, conditionals, loops, and operators. The \texttt{expr} rule handles precedence:
-
+Expressions (Section 7) cover a wide range of constructs, with operator precedence encoded by rule ordering (Section 11.1):
 \begin{lstlisting}
-expr : expr (AT TYPE)? DOT ID LPAREN exprList? RPAREN  # Dispatch
-     | IF expr THEN expr ELSE expr FI                 # IfElse
-     | expr PLUS expr                                 # Addition
-     | ID                                             # Identifier
-     | INT                                            # Integer
-     // ... other expression types
-;
+expr
+    : expr (AT TYPE)? DOT ID LPAREN exprList? RPAREN                 # Dispatch
+    | ID LPAREN exprList? RPAREN                                     # MethodCall
+    | IF expr THEN expr ELSE expr FI                                 # IfElse
+    | WHILE expr LOOP expr POOL                                      # While
+    | LBRACE (expr SEMICOLON)+ RBRACE                                # Block
+    | LET letDecl (COMMA letDecl)* IN expr                           # Let
+    | CASE expr OF caseBranch+ ESAC                                  # Case
+    | NEW (TYPE | SELF_TYPE)                                         # New
+    | TILDE expr                                                     # Negation
+    | ISVOID expr                                                    # Isvoid
+    | expr TIMES expr                                                # Multiplication
+    | expr DIVIDE expr                                               # Division
+    | expr PLUS expr                                                 # Addition
+    | expr MINUS expr                                                # Subtraction
+    | expr LT expr                                                   # LessThan
+    | expr LEQ expr                                                  # LessThanEqual
+    | expr EQ expr                                                   # Equal
+    | NOT expr                                                       # Not
+    | ID ARROW expr                                                  # Assignment
+    | LPAREN expr RPAREN                                             # Parentheses
+    | ID                                                             # Identifier
+    | INT                                                            # Integer
+    | STRING                                                         # String
+    | TRUE                                                           # True
+    | FALSE                                                          # False
+    ;
 \end{lstlisting}
+The rule order ensures higher precedence for operators like \texttt{*} and \texttt{/} over \texttt{+} and \texttt{-}, and for unary operators (\texttt{\textasciitilde}, \texttt{isvoid}, \texttt{not}) over binary operators.
 
-Precedence is encoded via rule ordering (Section 11.1), with \texttt{.} having the highest precedence.
+\subsubsection{Additional Constructs}
+Supporting constructs include:
+\begin{lstlisting}
+exprList
+    : expr (COMMA expr)*
+    ;
+letDecl
+    : ID COLON (TYPE | SELF_TYPE) (ARROW expr)?
+    ;
+caseBranch
+    : ID COLON (TYPE | SELF_TYPE) CASEASSIGN expr SEMICOLON
+    ;
+\end{lstlisting}
+\texttt{exprList} defines comma-separated argument lists, \texttt{letDecl} specifies let variable declarations, and \texttt{caseBranch} defines branches for case expressions.
 
 \subsection{Implementation}
-The parser, defined in \texttt{CoolParser.g4}, generates \texttt{CoolParser.java}, which consumes tokens from \texttt{CoolLexer.java}. Key design decisions:
+The parser, defined in \texttt{CoolParser.g4} and built on ANTLR 4, generates a Java parser class that constructs a labeled parse tree from tokens produced by \texttt{CoolLexer}. The grammar uses parser rules with labels (e.g., \texttt{\# Dispatch}, \texttt{\# Method}) to annotate parse tree nodes, facilitating AST construction. Key implementation aspects include:
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Error Strategy}: \texttt{BailErrorStrategy} halts on syntax errors, providing immediate feedback.
-    \item \textbf{Labeled Alternatives}: Labels (e.g., \texttt{\# Dispatch}) simplify AST construction.
-    \item \textbf{Precedence Handling}: Rule structure ensures correct operator precedence and associativity.
-    \item \textbf{Token Integration}: \texttt{tokenVocab=CoolLexer} links lexer and parser.
+    \item \textbf{Token Integration}: Relies on \texttt{CoolLexer}'s token vocabulary (e.g., \texttt{CLASS}, \texttt{TYPE}, \texttt{SELF\_TYPE}), ensuring seamless lexer-parser integration.
+    \item \textbf{Error Handling}: Employs ANTLR's \texttt{BailErrorStrategy} to halt parsing on the first syntactic error, providing immediate feedback with line numbers for issues like missing semicolons or unmatched braces.
+    \item \textbf{Parse Tree Construction}: Generates a tree with labeled nodes (e.g., \texttt{IfElse}, \texttt{Addition}) that capture the hierarchical structure of COOL programs, enabling precise mapping to AST nodes.
+    \item \textbf{Precedence Handling}: Encodes operator precedence through rule ordering, ensuring expressions like \texttt{a + b * c} are parsed as \texttt{a + (b * c)}.
 \end{itemize}
-
-Challenges included managing COOL's complex expression grammar and ensuring unambiguous parsing of nested constructs, addressed through careful rule design and testing.
-
-\subsection{Features}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Complete Grammar}: Supports all COOL constructs.
-    \item \textbf{Error Detection}: Reports syntax errors with line numbers.
-    \item \textbf{Precedence Accuracy}: Correctly handles operator precedence.
-    \item \textbf{Parse Tree Output}: Facilitates AST construction.
-\end{itemize}
+The generated parser class processes input incrementally, building the parse tree in a single pass, which is then traversed by \texttt{ASTBuilder.java} to create the AST.
 
 \subsection{Example}
-For:
+For the sample program:
 \begin{lstlisting}
-let x : Int <    \item 42 in if x < 50 then x + 1 else x fi
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
 \end{lstlisting}
-the parser builds a tree with nodes for \texttt{let}, \texttt{IfElse}, \texttt{BinaryOp(<)}, and \texttt{BinaryOp(+)}, preserving syntactic hierarchy.
+The parser constructs a parse tree as follows:
+\begin{itemize}[leftmargin=*]
+    \item \texttt{program}: Contains a single \texttt{class} node.
+    \item \texttt{class}: Labeled as \texttt{class}, with \texttt{TYPE(Main)}, \texttt{INHERITS IO}, and features \texttt{attribute(x)} and \texttt{method(main)}.
+    \item \texttt{feature (Attribute)}: For \texttt{x : Int <- 42}, includes \texttt{ID(x)}, \texttt{TYPE(Int)}, and \texttt{expr} (\texttt{Integer} with \texttt{INT(42)}).
+    \item \texttt{feature (Method)}: For \texttt{main}, includes \texttt{ID(main)}, empty \texttt{formal} list, \texttt{TYPE(Object)}, and \texttt{expr} (a \texttt{Let} node).
+    \item \texttt{expr (Let)}: Contains a \texttt{letDecl} (\texttt{ID(y) : TYPE(Int) ARROW expr(Addition)}), where the initializer is \texttt{expr(Identifier(x)) PLUS expr(Integer(1))}.
+    \item \texttt{expr (IfElse)}: Includes \texttt{expr(LessThanEqual)} (\texttt{ID(y) LEQ INT(50)}), \texttt{then} branch (\texttt{Dispatch} for \texttt{out\_int(y)}), and \texttt{else} branch (\texttt{Dispatch} for \texttt{abort()}).
+\end{itemize}
+This tree captures the syntactic structure, with labeled nodes reflecting the grammar rules applied.
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ANTLR Usage}: Chosen for its robust grammar specification, automatic parser generation, and error handling capabilities.
+    \item \textbf{Precedence Encoding}: Ordered expression rules to match COOL's precedence (Section 11.1), simplifying parsing without explicit precedence declarations.
+    \item \textbf{Error Strategy}: Adopted \texttt{BailErrorStrategy} for immediate error reporting, suitable for educational use where quick feedback is critical.
+    \item \textbf{Labeled Rules}: Used ANTLR labels to annotate parse tree nodes, streamlining the transition to AST construction.
+\end{itemize}
 
 \section{Abstract Syntax Tree Construction}
 \label{sec:ast}
 
 \subsection{Purpose}
-AST construction transforms the parse tree into a semantic representation, abstracting syntactic details for type checking and code generation (Sections 3, 7, 11~\cite{cool_manual}). The AST simplifies subsequent phases by focusing on program meaning.
+AST construction transforms the parse tree into a semantic representation suitable for type checking, code generation, and visualization, as specified in Sections 3, 7, and 11 of the COOL Reference Manual~\cite{cool_manual}.
 
 \subsection{Background}
-The AST represents COOL programs hierarchically, with nodes for classes, features, and expressions. Implemented in \texttt{ASTBuilder.java}, it uses a visitor pattern to traverse the parse tree. The design prioritizes extensibility and error reporting, with challenges including handling \texttt{SELF\_TYPE} and maintaining line numbers for diagnostics.
+The AST, implemented in \texttt{ASTBuilder.java}, uses a visitor pattern to traverse the parse tree generated by \texttt{CoolParser}. It handles \texttt{SELF\_TYPE} in type annotations and maintains line numbers for precise error reporting, facilitating subsequent compiler phases.
 
-\subsection{AST Structure}
-The AST, in the \texttt{ast} package, uses \texttt{ASTNode} (\texttt{ASTNode.java}) as the base class, with fields for line numbers and a visitor method. Key nodes include:
+\subsection{AST Node Hierarchy}
+The \texttt{ast} package defines a comprehensive hierarchy of nodes to represent the abstract syntax tree (AST) for COOL programs, as specified in Sections 3, 7, and 11 of the COOL Reference Manual~\cite{cool_manual}. Each node type corresponds to a syntactic construct in the language, enabling semantic analysis, intermediate code generation, and visualization. The hierarchy is rooted in \texttt{ASTNode}, an abstract base class defined in \texttt{ASTNode.java}, which provides a line number for error reporting and an \texttt{accept} method for the visitor pattern, as specified in \texttt{ASTVisitor.java}. The complete node hierarchy is as follows:
+
 \begin{itemize}[leftmargin=*]
-    \item \texttt{ProgramNode}: List of \texttt{ClassNode}s.
-    \item \texttt{ClassNode}: Name, parent, features.
-    \item \texttt{MethodNode}: Parameters, return type, body.
-    \item \texttt{AttributeNode}: Name, type, optional initialization.
-    \item \texttt{ExpressionNode}: Subclasses like \texttt{DispatchNode}, \texttt{LetNode}, \texttt{BinaryOpNode}.
+    \item \texttt{ProgramNode}: Represents the entire COOL program, containing a list of class definitions.
+    \item \texttt{ClassNode}: Represents a class definition, including its name, optional parent class (for inheritance), and a list of features (attributes and methods).
+    \item \texttt{FeatureNode}: An abstract base class for class features, with two derived types:
+        \begin{itemize}[leftmargin=*]
+            \item \texttt{MethodNode}: Represents a method, including its name, formal parameters, return type (including \texttt{SELF\_TYPE}), and body expression.
+            \item \texttt{AttributeNode}: Represents an attribute, including its name, type, and optional initialization expression.
+        \end{itemize}
+    \item \texttt{FormalNode}: Represents a method parameter, including its name and type (including \texttt{SELF\_TYPE}).
+    \item \texttt{ExpressionNode}: An abstract base class for all expression nodes, with the following derived types:
+        \begin{itemize}[leftmargin=*]
+            \item \texttt{DispatchNode}: Represents a method dispatch (e.g., \texttt{obj.method(args)}), including the receiver expression, optional static type for dispatch, method name, and argument expressions.
+            \item \texttt{MethodCallNode}: Represents an implicit \texttt{self} method call (e.g., \texttt{method(args)}), including the method name and argument expressions.
+            \item \texttt{IfElseNode}: Represents a conditional expression (\texttt{if-then-else}), including the condition, then branch, and else branch expressions.
+            \item \texttt{WhileNode}: Represents a loop (\texttt{while-loop-pool}), including the condition and body expressions.
+            \item \texttt{BlockNode}: Represents a block of expressions enclosed in braces, containing a list of expressions executed sequentially.
+            \item \texttt{LetNode}: Represents a let expression, including a list of variable declarations (\texttt{LetDeclNode}) and a body expression.
+            \item \texttt{LetDeclNode}: Represents a variable declaration within a let expression, including the variable name, type, and optional initialization expression.
+            \item \texttt{CaseNode}: Represents a case expression, including the expression to evaluate and a list of case branches (\texttt{CaseBranchNode}).
+            \item \texttt{CaseBranchNode}: Represents a branch in a case expression, including the variable name, type, and body expression.
+            \item \texttt{NewNode}: Represents object creation (\texttt{new Type}), including the type of the object to instantiate.
+            \item \texttt{UnaryOpNode}: Represents a unary operation (e.g., \texttt{\textasciitilde}, \texttt{isvoid}, \texttt{not}), including the operator and operand expression.
+            \item \texttt{BinaryOpNode}: Represents a binary operation (e.g., \texttt{+}, \texttt{*}, \texttt{<}), including the operator and two operand expressions.
+            \item \texttt{AssignmentNode}: Represents an assignment (\texttt{identifier <- expr}), including the variable name and assigned expression.
+            \item \texttt{IdNode}: Represents an identifier reference (e.g., a variable like \texttt{x} or \texttt{self}).
+            \item \texttt{IntNode}: Represents an integer constant (e.g., \texttt{42}).
+            \item \texttt{StringNode}: Represents a string constant (e.g., \texttt{"hello"}).
+            \item \texttt{BoolNode}: Represents a boolean constant (\texttt{true} or \texttt{false}).
+        \end{itemize}
 \end{itemize}
 
-The \texttt{ASTVisitor} interface (\texttt{ASTVisitor.java}) supports extensible processing.
+This hierarchy captures all syntactic constructs of COOL, enabling robust processing for type checking, code generation, and visualization. Each node type implements the visitor pattern via \texttt{ASTNode.accept}, as defined in \texttt{ASTVisitor.java}, allowing modular and extensible operations on the AST.
 
 \subsection{Implementation}
-\texttt{ASTBuilder.java} extends \texttt{CoolParserBaseVisitor<ASTNode>} to construct the AST. A key method is:
+The AST is constructed by \texttt{ASTBuilder.java}, which extends \texttt{CoolParserBaseVisitor<ASTNode>} to traverse the parse tree produced by \texttt{CoolParser}. It converts parse tree nodes into corresponding AST nodes, preserving semantic information and omitting syntactic tokens (e.g., semicolons, braces). The visitor pattern ensures each parse tree context is mapped to the appropriate AST node type. Key methods include:
 
 \begin{lstlisting}
+@Override
 public ProgramNode visitProgram(CoolParser.ProgramContext ctx) {
     List<ClassNode> classes = new ArrayList<>();
     for (CoolParser.ClassContext classCtx : ctx.class_()) {
         classes.add((ClassNode) visit(classCtx));
     }
-    return new ProgramNode(classes, ctx.start.getLine());
+    int lineNumber = ctx.start.getLine();
+    return new ProgramNode(classes, lineNumber);
 }
 \end{lstlisting}
 
-\subsubsection{Design Decisions}
-
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Visitor Pattern}: Enables modular processing for semantic analysis and code generation.
-    \item \textbf{Line Numbers}: Stored in each node for precise error reporting.
-    \item \textbf{Type Support}: Explicit handling of \texttt{SELF\_TYPE} in declarations.
-    \item \textbf{Simplification}: Omits syntactic tokens (e.g., semicolons) to focus on semantics.
+    \item \texttt{visitProgram}: Iterates over class contexts, constructing \texttt{ClassNode} instances and aggregating them into a \texttt{ProgramNode} with the program's line number.
+    \item \texttt{visitClass}: Extracts the class name, optional parent class, and features, creating a \texttt{ClassNode}. Features are processed by visiting \texttt{feature} contexts to produce \texttt{MethodNode} or \texttt{AttributeNode} instances.
+    \item \texttt{visitMethod} and \texttt{visitAttribute}: For methods, collects formal parameters (\texttt{FormalNode}), return type (supporting \texttt{SELF\_TYPE}), and body expression. For attributes, captures name, type, and optional initializer expression.
+    \item \texttt{visitDispatch} and \texttt{visitMethodCall}: Constructs \texttt{DispatchNode} for explicit receiver calls (e.g., \texttt{obj.method(args)}) and \texttt{MethodCallNode} for implicit \texttt{self} calls, handling argument lists.
+    \item \texttt{visitIfElse}, \texttt{visitWhile}, \texttt{visitLet}, \texttt{visitCase}: Builds nodes for control flow and scoping constructs, recursively processing sub-expressions and declarations (e.g., \texttt{LetDeclNode}, \texttt{CaseBranchNode}).
+    \item \texttt{visitNegation}, \texttt{visitIsvoid}, \texttt{visitNot}: Creates \texttt{UnaryOpNode} instances with operators (\texttt{\textasciitilde}, \texttt{isvoid}, \texttt{not}) and operand expressions.
+    \item \texttt{visitMultiplication}, \texttt{visitAddition}, etc.: Constructs \texttt{BinaryOpNode} instances for operators (e.g., \texttt{*}, \texttt{+}, \texttt{<=}), linking left and right operand expressions.
+    \item \texttt{visitIdentifier}, \texttt{visitInteger}, \texttt{visitString}, \texttt{visitTrue}, \texttt{visitFalse}: Produces leaf nodes (\texttt{IdNode}, \texttt{IntNode}, \texttt{StringNode}, \texttt{BoolNode}) for basic expressions, handling string literal parsing (e.g., removing quotes).
 \end{itemize}
 
-Challenges included mapping complex parse tree nodes to streamlined AST nodes and ensuring \texttt{SELF\_TYPE} was correctly represented, resolved through a robust node hierarchy.
+The \texttt{ASTBuilder} ensures all nodes inherit from \texttt{ASTNode}, which provides a \texttt{lineNumber} field for diagnostics and an \texttt{accept} method for visitor-based processing. The construction process is deterministic, with each parse tree context mapping to a single AST node, ensuring a streamlined representation for downstream phases.
 
 \subsection{Features}
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Semantic Focus}: Abstracts syntactic details.
-    \item \textbf{Extensibility}: Visitor pattern supports new analyses.
-    \item \textbf{Error Support}: Line numbers aid diagnostics.
-    \item \textbf{COOL Compliance}: Handles all language constructs.
+    \item \textbf{Class Support}: Captures class definitions, inheritance, and features (attributes and methods).
+    \item \textbf{Expression Coverage}: Supports all COOL expression types, including dispatches, conditionals, loops, and operators.
+    \item \textbf{Error Reporting}: Embeds line numbers in every node via \texttt{ASTNode}, enabling precise error diagnostics.
+    \item \textbf{Extensibility}: Leverages the visitor pattern through \texttt{ASTVisitor}, facilitating modular AST processing.
 \end{itemize}
 
 \subsection{Example}
-For:
+For the sample program:
 \begin{lstlisting}
 class Main inherits IO {
-    x : Int <    \item 42;
+    x : Int <- 42;
     main() : Object {
-        let y : Int <    \item x + 1 in out_int(y)
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
     };
 };
 \end{lstlisting}
-the AST includes a \texttt{ProgramNode} with a \texttt{ClassNode(Main)}, containing an \texttt{AttributeNode(x)} and a \texttt{MethodNode(main)} with a \texttt{LetNode} and \texttt{MethodCallNode(out\_int)}.
+The \texttt{ASTBuilder} constructs the following AST:
+\begin{itemize}[leftmargin=*]
+    \item \texttt{ProgramNode} (line 1): Contains a single \texttt{ClassNode}.
+    \item \texttt{ClassNode(Main)} (line 1): Has parent \texttt{IO}, features:
+        \begin{itemize}
+            \item \texttt{AttributeNode(x)} (line 2): Type \texttt{Int}, initializer \texttt{IntNode(42)}.
+            \item \texttt{MethodNode(main)} (line 3): Return type \texttt{Object}, no formals, body as \texttt{LetNode}.
+        \end{itemize}
+    \item \texttt{LetNode} (line 4): Contains one \texttt{LetDeclNode(y)} (type \texttt{Int}, initializer \texttt{BinaryOpNode(+)} with \texttt{IdNode(x)} and \texttt{IntNode(1)}) and body \texttt{IfElseNode}.
+    \item \texttt{IfElseNode} (line 5): Condition \texttt{BinaryOpNode(<=)} (\texttt{IdNode(y)}, \texttt{IntNode(50)}), then branch \texttt{DispatchNode} (\texttt{IdNode(self)}, method \texttt{out\_int}, argument \texttt{IdNode(y)}), else branch \texttt{DispatchNode} (\texttt{IdNode(self)}, method \texttt{abort}, no arguments).
+\end{itemize}
+The \texttt{ASTBuilder} maps parse tree contexts (e.g., \texttt{AdditionContext}, \texttt{DispatchContext}) to these nodes, preserving line numbers and semantic structure.
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Visitor Pattern}: Adopted for modular traversal of parse tree contexts, enabling clean mapping to AST nodes.
+    \item \textbf{Type Handling}: Explicitly supports \texttt{SELF\_TYPE} in \texttt{visitMethod}, \texttt{visitAttribute}, \texttt{visitFormal}, and \texttt{visitNew}, aligning with COOL's typing rules.
+    \item \textbf{Streamlined AST}: Eliminates syntactic tokens (e.g., \texttt{SEMICOLON}, \texttt{LBRACE}) to focus on semantic content.
+    \item \textbf{Line Number Tracking}: Integrates \texttt{lineNumber} in \texttt{ASTNode} for all nodes, enhancing error reporting.
+\end{itemize}
 
 \section{Semantic Analysis}
 \label{sec:semantic}
 
 \subsection{Purpose}
-Semantic analysis ensures type safety and semantic correctness, preventing runtime errors (Sections 4, 5, 6, 12~\cite{cool_manual}). It validates inheritance, method signatures, and expression types, reporting errors for violations.
+Semantic analysis ensures type safety and semantic correctness, preventing runtime errors as specified in Sections 4, 5, 6, and 12 of the COOL Reference Manual~\cite{cool_manual}. It validates inheritance hierarchies, method signatures, and expression types, ensuring compliance with COOL's static typing rules.
 
 \subsection{Background}
-COOL's type system requires static type checking, with rules for conformance, \texttt{SELF\_TYPE}, and method overriding. Implemented in \texttt{SemanticAnalyzer.java}, this phase uses symbol tables and class metadata to track scopes and types. Challenges include handling \texttt{SELF\_TYPE}'s dynamic typing and detecting inheritance cycles.
+Implemented in \texttt{SemanticAnalyzer.java}, this phase leverages \texttt{ClassTable.java} and \texttt{SymbolTable.java} to manage class metadata and variable scopes, respectively. Key challenges include handling \texttt{SELF\_TYPE}'s dynamic typing, detecting inheritance cycles, and ensuring method override consistency across class hierarchies.
 
 \subsection{Implementation}
-The \texttt{SemanticAnalyzer} uses \texttt{ClassTable} (\texttt{ClassTable.java}) for class metadata and \texttt{SymbolTable} (\texttt{SymbolTable.java}) for variable scopes. The main method is:
+The semantic analysis phase is orchestrated by \texttt{SemanticAnalyzer.java}, which implements the \texttt{ASTVisitor<String>} interface to traverse the abstract syntax tree (AST) and infer expression types. It relies on two core components:
 
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ClassTable}: Defined in \texttt{ClassTable.java}, it maintains a repository of class metadata, including class definitions (\texttt{classes}), inheritance relationships (\texttt{inheritance}), method signatures (\texttt{methods}), and attribute signatures (\texttt{attributes}). It initializes built-in classes (\texttt{Object}, \texttt{IO}, \texttt{Int}, \texttt{String}, \texttt{Bool}) with their standard methods (e.g., \texttt{Object.abort}, \texttt{String.concat}) and attributes. The \texttt{addClass} method populates this metadata for user-defined classes, checking for redefinition errors (e.g., redefining \texttt{IO}). The \texttt{checkInheritance} method validates inheritance by detecting undefined parent classes, illegal inheritance from basic classes (\texttt{Int}, \texttt{Bool}, \texttt{String}), and cyclic inheritance. The \texttt{checkFeatureRedefinition} method ensures attributes are not redefined in subclasses and that overridden methods maintain identical signatures.
+
+    \item \textbf{SymbolTable}: Defined in \texttt{SymbolTable.java}, it manages nested scopes for variables using a list of \texttt{Map<String, String>} objects, where each map represents a scope mapping variable names to their types. The \texttt{enterScope} and \texttt{exitScope} methods handle scope nesting for blocks like methods and let expressions. The \texttt{put} method adds variables to the current scope, checking for illegal \texttt{self} bindings and redefinitions within the same scope. The \texttt{lookup} method searches scopes from innermost to outermost to resolve variable types.
+
+\end{itemize}
+
+The main entry point, \texttt{SemanticAnalyzer.analyze}, performs a two-pass analysis:
 \begin{lstlisting}
 public List<String> analyze(ProgramNode program) {
     for (ClassNode classNode : program.classes) {
         classTable.addClass(classNode);
     }
     classTable.checkInheritance();
+    classTable.checkFeatureRedefinition();
     errors.addAll(classTable.getErrors());
     program.accept(this);
     return errors;
 }
 \end{lstlisting}
 
-\subsubsection{Key Components}
+In the first pass, it populates \texttt{ClassTable} with class definitions and validates inheritance and feature redefinitions. In the second pass, it traverses the AST using the visitor pattern, performing type checking for each node. Key visitor methods include:
 
 \begin{itemize}[leftmargin=*]
-    \item \textbf{ClassTable}: Stores class names, parents, methods, and attributes, checking for cycles and illegal inheritance (e.g., \texttt{BASIC} classes).
-    \item \textbf{SymbolTable}: Manages nested scopes for variables, updated for \texttt{let} and method parameters.
-    \item \textbf{Type Checking}: Infers expression types using Section 12.2 rules, ensuring conformance.
-\end{itemize}
-    
-\subsubsection{Design Decisions}
+    \item \texttt{visit(ClassNode)}: Enters a new scope, adds attributes to \texttt{SymbolTable}, and visits features, ensuring attributes are not named \texttt{self}.
+    \item \texttt{visit(MethodNode)}: Enters a method scope, adds parameters to \texttt{SymbolTable}, checks the body expression's type against the declared return type using \texttt{ClassTable.conforms}, and reports type mismatches.
+    \item \texttt{visit(DispatchNode)}: Verifies the receiver's type, checks method existence in \texttt{ClassTable}, validates argument counts and types, and handles static dispatch and \texttt{SELF\_TYPE} returns.
+    \item \texttt{visit(IfElseNode)}: Ensures the condition is \texttt{Bool}, computes the least common ancestor of then and else branch types using \texttt{ClassTable.join}.
+    \item \texttt{visit(LetNode)} and \texttt{visit(CaseNode)}: Manage nested scopes and validate bindings, checking for distinct case branch types.
 
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Two-Pass Analysis}: First builds \texttt{ClassTable}, then checks expressions to handle forward references.
-    \item \textbf{Error Accumulation}: Collects all errors for comprehensive reporting.
-    \item \textbf{Visitor Pattern}: Traverses AST for type inference.
 \end{itemize}
 
-Challenges included implementing \texttt{SELF\_TYPE} conformance and ensuring method override rules (Section 6), resolved through detailed type inference algorithms.
+The \texttt{ClassTable.conforms} method implements type conformance rules, resolving \texttt{SELF\_TYPE} to the current class and checking inheritance chains. The \texttt{ClassTable.join} method computes the least common ancestor for expressions like \texttt{if-then-else}. Errors are collected in a \texttt{List<String>} across all components, with line numbers for precise diagnostics.
 
 \subsection{Features}
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Type Safety}: Prevents runtime type errors.
-    \item \textbf{Inheritance Validation}: Detects cycles and illegal parents.
-    \item \textbf{Method Checking}: Ensures override compatibility.
-    \item \textbf{Detailed Errors}: Provides line numbers and context.
+    \item \textbf{Type Checking}: Validates all expressions (Section 12.2), including dispatches, conditionals, let bindings, and operators, ensuring type conformance.
+    \item \textbf{Inheritance Validation}: Detects cycles, undefined parents, and illegal inheritance from built-in classes (Section 3.2).
+    \item \textbf{Method Redefinition}: Ensures overridden methods have matching signatures (Section 6).
+    \item \textbf{Error Reporting}: Collects detailed errors with line numbers for undefined types, type mismatches, and invalid \texttt{self} usage.
+    \item \textbf{Built-in Classes}: Initializes standard classes with their methods, ensuring correct semantics (Section 9).
 \end{itemize}
 
 \subsection{Example}
-For:
+For the sample program:
 \begin{lstlisting}
-let y : Int <    \item x + 1 in if y <= 50 then out_int(y) else abort() fi
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
 \end{lstlisting}
-the analyzer verifies \texttt{x : Int}, computes \texttt{x + 1 : Int}, \texttt{y <= 50 : Bool}, and checks \texttt{out\_int} and \texttt{abort} dispatches, determining the \texttt{if} type as \texttt{Object}.
+
+Semantic analysis proceeds as follows:
+\begin{enumerate}[leftmargin=*]
+    \item \texttt{ClassTable} adds \texttt{Main} with parent \texttt{IO}, attribute \texttt{x : Int}, and method \texttt{main}. It validates inheritance and checks for feature redefinition.
+    \item \texttt{SymbolTable} creates a scope for \texttt{Main}, adding \texttt{x : Int}. For \texttt{main}, it enters a new scope.
+    \item Type checking:
+        \begin{itemize}
+            \item \texttt{let y : Int <- x + 1}: \texttt{SymbolTable.lookup} finds \texttt{x : Int}, \texttt{visit(BinaryOpNode)} verifies \texttt{x + 1} yields \texttt{Int}, and \texttt{ClassTable.conforms} ensures \texttt{Int} matches \texttt{y}'s type.
+            \item \texttt{y <= 50}: Confirms \texttt{y : Int} and \texttt{50 : Int}, returning \texttt{Bool}.
+            \item \texttt{out\_int(y)}: \texttt{ClassTable.findMethod} locates \texttt{IO.out\_int}, verifies \texttt{y : Int} conforms to the parameter type, and returns \texttt{SELF\_TYPE} (resolved to \texttt{Main}).
+            \item \texttt{abort()}: Finds \texttt{Object.abort}, returning \texttt{Object}.
+            \item \texttt{if-then-else}: Ensures condition is \texttt{Bool}, uses \texttt{ClassTable.join} to compute \texttt{Object} as the result type.
+        \end{itemize}
+    \item No errors are reported, confirming type safety.
+\end{enumerate}
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Two-Pass Analysis}: Separates class metadata collection from type checking to handle forward references.
+    \item \textbf{Error Accumulation}: Collects all errors for comprehensive reporting, enhancing debugging.
+    \item \textbf{SELF\_TYPE Handling}: Dynamically resolves \texttt{SELF\_TYPE} using \texttt{currentClass}, supporting COOL's dynamic typing (Section 5.5).
+    \item \textbf{Modular Design}: Separates \texttt{ClassTable} and \texttt{SymbolTable} for clear responsibility division and reusability.
+\end{itemize}
 
 \section{Intermediate Code Generation}
 \label{sec:tac}
 
 \subsection{Purpose}
-Intermediate code generation produces Three-Address Code (TAC) from the AST, serving as a platform-independent representation for optimization and code generation (Section 13~\cite{cool_manual}). TAC simplifies complex expressions into three-operand instructions.
+This phase generates Three-Address Code (TAC) from the AST, producing a platform-independent intermediate representation suitable for optimization and backend code generation, as outlined in Section 13~\cite{cool_manual}.
 
 \subsection{Background}
-TAC is a low-level representation where each instruction has at most three operands, making it ideal for optimization and translation to assembly. Implemented in \texttt{TACGenerator.java}, this phase handles COOL's object-oriented features and control flow. Challenges include translating complex expressions (e.g., nested dispatches) and managing temporary variables.
+TAC, implemented in \texttt{TACGenerator.java}, uses three-operand instructions to represent COOL programs in a simplified, linear form. It supports COOL's object-oriented features (e.g., method dispatch, attribute access), control flow constructs, and dynamic typing with \texttt{SELF\_TYPE}, while managing temporaries and labels for efficient translation.
 
-\subsection{TAC Structure}
-TAC, defined in \texttt{TACProgram.java}, organizes instructions by class and method. Instructions include \texttt{ASSIGN}, \texttt{BINARY}, \texttt{CALL}, \texttt{JUMP}, etc. Example:
+\subsection{TAC Representation}
+The \texttt{intermediate} package defines the infrastructure for TAC generation:
 
-\begin{lstlisting}
-public class AssignTAC extends TACInstruction {
-    private String source;
-    public AssignTAC(String result, String source, int lineNumber) {
-        super(Opcode.ASSIGN, result, lineNumber);
-        this.source = source;
-    }
-}
-\end{lstlisting}
+\begin{itemize}[leftmargin=*]
+    \item \texttt{TACProgram}: Defined in \texttt{TACProgram.java}, organizes TAC instructions by class and method in a nested map (\texttt{Map<String, Map<String, List<TACInstruction>>>}). The \texttt{addMethod} method stores instructions for a specific class and method, and \texttt{toString} generates a human-readable representation of the program.
+    \item \texttt{TACInstruction}: An abstract base class in \texttt{TACInstruction.java}, defines the instruction format with an \texttt{Opcode}, optional result variable, and line number. Supported opcodes include:
+        \begin{itemize}
+            \item \texttt{ASSIGN}: Assigns a value to a variable (e.g., \texttt{x = y}).
+            \item \texttt{BINARY}: Performs a binary operation (e.g., \texttt{x = y + z}).
+            \item \texttt{UNARY}: Performs a unary operation (e.g., \texttt{x = \textasciitilde y}).
+            \item \texttt{GOTO}: Unconditional jump to a label (e.g., \texttt{goto L0}).
+            \item \texttt{IF}: Conditional jump (e.g., \texttt{if x goto L0}).
+            \item \texttt{CALL}: Method invocation (e.g., \texttt{x = call Class.method(args)}).
+            \item \texttt{RETURN}: Returns a value (e.g., \texttt{return x}).
+            \item \texttt{LABEL}: Defines a jump target (e.g., \texttt{L0:}).
+            \item \texttt{PARAM}: Declares a method parameter (e.g., \texttt{param x}).
+            \item \texttt{LOAD}: Loads an attribute (e.g., \texttt{x = load attr}).
+            \item \texttt{STORE}: Stores a value into an attribute (e.g., \texttt{store x -> attr}).
+        \end{itemize}
+\end{itemize}
+
+Each \texttt{TACInstruction} subclass implements \texttt{toString} to produce a readable instruction format, facilitating debugging and control flow graph (CFG) construction.
 
 \subsection{Implementation}
-\texttt{TACGenerator.java} traverses the AST, generating instructions. A key method is:
+The TAC is generated by \texttt{TACGenerator.java}, which implements \texttt{ASTVisitor<String>} to traverse the AST and produce instructions stored in \texttt{TACProgram}. The main entry point is:
 
 \begin{lstlisting}
-public String visitMethodCallNode(MethodCallNode node) {
-    List<String> argResults = new ArrayList<>();
-    for (ExpressionNode arg : node.args) {
-        argResults.add(arg.accept(this));
-    }
-    String result = newTemp();
-    currentInstructions.add(new CallTAC(result, currentClass + "." + node.method, argResults, node.lineNumber));
-    return result;
+public TACProgram generate(ProgramNode node) {
+    node.accept(this);
+    return program;
 }
 \end{lstlisting}
 
-\subsection{Design Decisions}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Temporary Variables}: Generated for intermediate results to ensure evaluation order.
-    \item \textbf{Control Flow}: Labels and jumps handle conditionals and loops.
-    \item \textbf{Object-Oriented Support}: Instructions for attribute access and dispatch.
-    \item \textbf{Modularity}: Separate classes for each instruction type.
-\end{itemize}    
+The \texttt{TACGenerator} maintains state for the current class (\texttt{currentClass}), method (\texttt{currentMethod}), and instruction list (\texttt{currentInstructions}), using \texttt{ClassTable} and \texttt{SymbolTable} for type and scope information. It generates unique temporaries (\texttt{newTemp}) and labels (\texttt{newLabel}) to manage variables and control flow. Key visitor methods include:
 
-Challenges included handling \texttt{SELF\_TYPE} dispatches and ensuring correct control flow, addressed through careful instruction design and testing.
+\begin{itemize}[leftmargin=*]
+    \item \texttt{visitProgram}: Iterates over classes, delegating to \texttt{visitClass}.
+    \item \texttt{visitClass}: Sets \texttt{currentClass} and processes methods, ignoring attributes unless initialized.
+    \item \texttt{visitMethod}: Creates a new instruction list, enters a scope, adds \texttt{ParamTAC} for parameters, generates TAC for the body, adds a \texttt{ReturnTAC}, and stores the method in \texttt{TACProgram}.
+    \item \texttt{visitAttribute}: Generates \texttt{StoreTAC} for initialized attributes, storing the initializer's result.
+    \item \texttt{visitDispatch} and \texttt{visitMethodCall}: Generate \texttt{CallTAC} for method invocations, handling receiver and arguments, with \texttt{MethodCallNode} prefixing the class name for implicit \texttt{self} calls.
+    \item \texttt{visitIfElse}: Emits \texttt{IfTAC}, \texttt{GotoTAC}, and \texttt{LabelTAC} to implement conditional branching, assigning the result to a temporary if both branches yield values.
+    \item \texttt{visitWhile}: Uses \texttt{LabelTAC}, \texttt{IfTAC}, and \texttt{GotoTAC} to create a loop structure with start, body, and end labels.
+    \item \texttt{visitLet} and \texttt{visitCase}: Manage scopes via \texttt{SymbolTable}, generating \texttt{AssignTAC} for let initializers and simplified type-checking for case branches.
+    \item \texttt{visitUnaryOpNode} and \texttt{visitBinaryOpNode}: Produce \texttt{UnaryTAC} and \texttt{BinaryTAC} for operators (e.g., \texttt{\textasciitilde}, \texttt{+}), storing results in temporaries.
+    \item \texttt{visitAssignment}: Emits \texttt{AssignTAC} for local variables or \texttt{StoreTAC} for attributes, based on \texttt{SymbolTable.lookup}.
+    \item \texttt{visitIdNode}, \texttt{visitIntNode}, \texttt{visitStringNode}, \texttt{visitBoolNode}: Generate \texttt{LoadTAC} for attributes or return variable names for locals, and \texttt{AssignTAC} for constants.
+\end{itemize}
+
+The generator ensures instructions include line numbers for debugging and maintains scope consistency using \texttt{SymbolTable}, producing a linear sequence of TAC instructions per method.
 
 \subsection{Features}
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Full Expression Support}: Translates all COOL expressions.
-    \item \textbf{Control Flow}: Accurate jumps and labels.
-    \item \textbf{Temporary Management}: Prevents register conflicts.
-    \item \textbf{COOL Compliance}: Supports object-oriented features.
+    \item \textbf{Expression Translation}: Supports all COOL constructs, including dispatches, conditionals, loops, let bindings, and operators, with appropriate TAC instructions.
+    \item \textbf{Control Flow}: Implements conditionals and loops using \texttt{IF}, \texttt{GOTO}, and \texttt{LABEL} opcodes, enabling accurate CFG construction.
+    \item \textbf{Object-Oriented Support}: Handles method calls (\texttt{CALL}), attribute access (\texttt{LOAD}, \texttt{STORE}), and object creation (\texttt{new Type}).
+    \item \textbf{Error Tracking}: Embeds line numbers in instructions, aiding debugging during optimization and code generation.
 \end{itemize}
 
 \subsection{Example}
-For:
+For the sample program:
 \begin{lstlisting}
-let y : Int <    \item x + 1 in if y <= 50 then out_int(y) else abort() fi
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
 \end{lstlisting}
-TAC includes:
+The \texttt{TACGenerator} produces the following TAC for the \texttt{main} method (simplified for clarity):
+\begin{lstlisting}
+class Main:
+  method main:
+    t0 = load x
+    t1 = t0 + 1
+    y = t1
+    t2 = y <= 50
+    if t2 goto L0
+    t3 = call Object.abort()
+    goto L1
+    L0:
+    t4 = call IO.out_int(y)
+    t5 = t4
+    goto L1
+    L1:
+    return t5
+\end{lstlisting}
+\begin{itemize}[leftmargin=*]
+    \item \texttt{visitAttribute}: For \texttt{x : Int <- 42}, generates \texttt{t0 = 42; store t0 -> x} (in class initialization, not shown).
+    \item \texttt{visitLet}: Assigns \texttt{y} via \texttt{t0 = load x; t1 = t0 + 1; y = t1}.
+    \item \texttt{visitIfElse}: Generates \texttt{t2 = y <= 50; if t2 goto L0} for the condition, \texttt{t3 = call Object.abort()} for the else branch, and \texttt{t4 = call IO.out\_int(y); t5 = t4} for the then branch, with \texttt{goto L1} and \texttt{L1:} for convergence.
+    \item \texttt{visitMethod}: Adds \texttt{return t5} to return the if-else result.
+\end{itemize}
+This TAC reflects the control flow and expression evaluation, with temporaries (\texttt{t0}–\texttt{t5}) and labels (\texttt{L0}, \texttt{L1}).
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Visitor Pattern}: Ensures modular traversal of the AST, mapping each node to TAC instructions cleanly.
+    \item \textbf{Temporary Management}: Uses a counter-based \texttt{newTemp} for unique temporary variables, avoiding conflicts.
+    \item \textbf{Structured Output}: Organizes instructions by class and method in \texttt{TACProgram}, facilitating CFG construction and optimization.
+    \item \textbf{Scope Integration}: Leverages \texttt{SymbolTable} for accurate variable resolution (local vs. attribute), ensuring correct \texttt{LOAD} and \texttt{STORE} usage.
+\end{itemize}
+
+\section{Visualization}
+\label{sec:visualization}
+
+\subsection{Purpose}
+Visualization generates PNG images of parse trees, abstract syntax trees (ASTs), and control flow graphs (CFGs) to aid debugging and understanding of COOL programs, as referenced in Sections 11 and 13~\cite{cool_manual}.
+
+\subsection{Background}
+Implemented in the \texttt{visualization} package, this phase uses Graphviz to produce \texttt{.dot} files representing parse trees, ASTs, and CFGs, which are then converted to PNG images. Challenges include clearly representing hierarchical structures, maintaining semantic details (e.g., line numbers, types), and handling complex control flow in TAC instructions.
+
+\subsection{Implementation}
+The visualization phase is implemented through four key classes in the \texttt{visualization} package:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ParseTreeVisualizer}: Defined in \texttt{ParseTreeVisualizer.java}, generates a DOT representation of the parse tree from \texttt{CoolParser}'s \texttt{ParseTree}. It traverses the tree recursively, creating nodes for rule contexts (e.g., \texttt{program}, \texttt{class}) and terminals (e.g., \texttt{CLASS}, \texttt{ID}), labeled with rule names, token text, and line numbers. The \texttt{visualize} method writes the DOT graph to a file, using \texttt{node [shape=box]} for consistent styling.
+    \item \textbf{ASTVisualizer}: Defined in \texttt{ASTVisualizer.java}, implements \texttt{ASTVisitor<String>} to traverse the AST and generate a DOT graph. Each node is labeled with its type (e.g., \texttt{Class: Main}, \texttt{IfElse}) and attributes (e.g., line number, return type). The \texttt{newNodeId} method assigns unique IDs, and \texttt{addEdge} creates directed edges for parent-child relationships. The \texttt{visualize} method outputs the graph with \texttt{node [shape=box]}.
+    \item \textbf{CFGVisualizer}: Defined in \texttt{CFGVisualizer.java}, generates a DOT graph for the CFG from a \texttt{TACProgram}. It constructs basic blocks by splitting TAC instructions at control points (e.g., \texttt{GotoTAC}, \texttt{IfTAC}, \texttt{LabelTAC}) and builds edges based on control flow (e.g., jumps, sequential execution). Each block is a node labeled with its instructions, grouped in subgraphs per class and method (e.g., \texttt{cluster\_Main\_main}). Nodes use \texttt{shape=box, style=filled, fillcolor=lightgrey}.
+    \item \textbf{DotToImageConverter}: Defined in \texttt{DotToImageConverter.java}, converts \texttt{.dot} files to PNG images using the Graphviz \texttt{dot} command (\texttt{dot -Tpng input.dot -o output.png}). It handles errors via \texttt{ProcessBuilder}, verifies output file existence, and logs success or failure.
+\end{itemize}
+
+Each visualizer's \texttt{visualize} method produces a \texttt{.dot} file, which \texttt{DotToImageConverter.convertToPng} transforms into a PNG image. The process ensures robust error handling (e.g., \texttt{IOException} for file operations, Graphviz command failures) and consistent node styling across visualizations.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Parse Tree Visualization}: Displays the syntactic structure with rule and token nodes, including line numbers and token text for precise debugging.
+    \item \textbf{AST Visualization}: Highlights the semantic structure with nodes for classes, methods, expressions, and their attributes (e.g., types, names), aiding semantic analysis.
+    \item \textbf{CFG Visualization}: Illustrates control flow through basic blocks, with subgraphs for each method and edges for jumps and sequential flow, supporting TAC optimization.
+    \item \textbf{PNG Output}: Produces high-quality, portable images via Graphviz, compatible with various platforms.
+\end{itemize}
+
+\subsection{Example}
+For the sample program:
+\begin{lstlisting}
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
+\end{lstlisting}
+The visualizations are as follows:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Parse Tree} (\texttt{ParseTreeVisualizer}):
+        \begin{itemize}
+            \item Root: \texttt{program} (line 1), child \texttt{class}.
+            \item \texttt{class}: Children \texttt{CLASS}, \texttt{TYPE(Main)}, \texttt{INHERITS}, \texttt{TYPE(IO)}, \texttt{LBRACE}, two \texttt{feature} nodes, \texttt{RBRACE}, \texttt{SEMICOLON}.
+            \item \texttt{feature} (attribute): \texttt{ID(x)}, \texttt{COLON}, \texttt{TYPE(Int)}, \texttt{ARROW}, \texttt{expr} (\texttt{INT(42)}), \texttt{SEMICOLON}.
+            \item \texttt{feature} (method): \texttt{ID(main)}, \texttt{LPAREN}, \texttt{RPAREN}, \texttt{COLON}, \texttt{TYPE(Object)}, \texttt{LBRACE}, \texttt{expr} (\texttt{Let}), \texttt{RBRACE}, \texttt{SEMICOLON}.
+            \item \texttt{Let}: \texttt{LET}, \texttt{letDecl} (\texttt{ID(y)}, \texttt{TYPE(Int)}, \texttt{ARROW}, \texttt{expr(BinaryOp: +)}), \texttt{IN}, \texttt{expr(IfElse)}.
+            \item \texttt{IfElse}: \texttt{IF}, \texttt{expr(BinaryOp: <=)}, \texttt{THEN}, \texttt{expr(Dispatch: out\_int)}, \texttt{ELSE}, \texttt{expr(Dispatch: abort)}, \texttt{FI}.
+        \end{itemize}
+    \item \textbf{AST} (\texttt{ASTVisualizer}):
+        \begin{itemize}
+            \item Root: \texttt{Program} (line 1), child \texttt{Class: Main}.
+            \item \texttt{Class: Main} (inherits \texttt{IO}, line 1): Children \texttt{Attribute: x} (type \texttt{Int}, line 2), \texttt{Method: main} (return \texttt{Object}, line 3).
+            \item \texttt{Attribute: x}: Child \texttt{Int: 42}.
+            \item \texttt{Method: main}: Child \texttt{Let} (line 4).
+            \item \texttt{Let}: Child \texttt{LetDecl: y} (type \texttt{Int}, initializer \texttt{BinaryOp: +} with \texttt{Id: x}, \texttt{Int: 1}), body \texttt{IfElse}.
+            \item \texttt{IfElse} (line 5): Children \texttt{BinaryOp: <=} (\texttt{Id: y}, \texttt{Int: 50}), \texttt{Dispatch: out\_int} (\texttt{Id: self}, argument \texttt{Id: y}), \texttt{Dispatch: abort} (\texttt{Id: self}).
+        \end{itemize}
+    \item \textbf{CFG} (\texttt{CFGVisualizer}, for \texttt{main} method):
+        \begin{itemize}
+            \item Subgraph: \texttt{cluster\_Main\_main}.
+            \item Block 1: \texttt{t0 = load x; t1 = t0 + 1; y = t1; t2 = y <= 50}, edges to Block 2 (if true) and Block 3 (if false).
+            \item Block 2: \texttt{L0: t4 = call IO.out\_int(y); t5 = t4}, edge to Block 4.
+            \item Block 3: \texttt{t3 = call Object.abort()}, edge to Block 4.
+            \item Block 4: \texttt{L1: return t5}.
+        \end{itemize}
+\end{itemize}
+
+Each visualization is output as a \texttt{.dot} file and converted to a PNG image, with nodes labeled by their type, attributes, and line numbers, and edges representing structural or control flow relationships.
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Graphviz Format}: Chosen for cross-platform compatibility and robust rendering of directed graphs in PNG format.
+    \item \textbf{Node Labeling}: Includes semantic details (e.g., line numbers, types, instruction text) to enhance debugging and comprehension.
+    \item \textbf{Basic Blocks}: Splits TAC instructions at control points (e.g., \texttt{GotoTAC}, \texttt{IfTAC}) in \texttt{CFGVisualizer} to clearly represent control flow.
+    \item \textbf{Error Handling}: Implements robust file I/O and process execution checks in \texttt{DotToImageConverter} to handle Graphviz failures gracefully.
+\end{itemize}
+
+\section{Optimization}
+\label{sec:optimization}
+
+\subsection{Purpose}
+Optimization improves the efficiency of Three-Address Code (TAC) by reducing runtime overhead and resource usage, as outlined in Section 13~\cite{cool_manual}, while preserving program semantics.
+
+\subsection{Background}
+Implemented in the \texttt{optimization} package, primarily through \texttt{ProgramOptimizer.java}, this phase applies a sequence of optimization passes, including constant folding and loop optimizations (loop-invariant code motion and loop unrolling). Key challenges include identifying optimizable patterns (e.g., constant expressions, loop structures) and ensuring semantic equivalence, particularly for COOL's object-oriented and dynamic features.
+
+\subsection{Implementation}
+The optimization framework, defined in \texttt{ProgramOptimizer.java}, orchestrates multiple passes over TAC instructions, each implementing the \texttt{OptimizationPass} interface from \texttt{OptimizationPass.java}. The main entry point is:
+
+\begin{lstlisting}
+public TACProgram optimize(TACProgram program) {
+    TACProgram optimizedProgram = new TACProgram();
+    for (String className : classMethods.keySet()) {
+        for (Map.Entry<String, List<TACInstruction>> entry : methods.entrySet()) {
+            List<TACInstruction> optimizedInstructions = instructions;
+            for (OptimizationPass pass : passes) {
+                optimizedInstructions = pass.optimize(optimizedInstructions);
+            }
+            optimizedProgram.addMethod(className, methodName, optimizedInstructions);
+        }
+    }
+    return optimizedProgram;
+}
+\end{lstlisting}
+
+The optimizer initializes with three passes in \texttt{ProgramOptimizer}:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ConstantFolder}: Implemented in \texttt{ConstantFolder.java}, evaluates constant expressions at compile time. It tracks constants in a \texttt{Map<String, String>} and optimizes:
+        \begin{itemize}
+            \item \texttt{AssignTAC}: Replaces variables with known constants (e.g., \texttt{t0 = 42}) and propagates them (e.g., \texttt{t1 = t0} becomes \texttt{t1 = 42}).
+            \item \texttt{BinaryTAC}: Evaluates binary operations with constant operands (e.g., \texttt{t2 = 42 + 1} becomes \texttt{t2 = 43}) using \texttt{evaluateBinary} for operators (\texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}).
+        \end{itemize}
+    \item \textbf{LoopOptimizer}: Implemented in \texttt{LoopOptimizer.java}, applies loop-invariant code motion (LICM) and loop unrolling, using \texttt{LoopAnalyzer} to identify loops:
+        \begin{itemize}
+            \item \texttt{LoopAnalyzer} (\texttt{LoopAnalyzer.java}): Builds a control flow graph (CFG) and detects loops via back-edges (e.g., \texttt{GotoTAC} to an earlier \texttt{LabelTAC}). It constructs \texttt{Loop} objects with header, body, and exit indices.
+            \item \texttt{LICM}: Moves invariant instructions (e.g., assignments or operations not dependent on loop-modified variables) to a preheader label, reducing redundant computations.
+            \item \texttt{Unrolling}: Replicates loop body \texttt{UNROLL\_FACTOR} (4) times for loops with a single exit (e.g., \texttt{IfTAC}), renaming temporaries to avoid conflicts, and adjusts control flow with a new exit label.
+        \end{itemize}
+    \item \textbf{ConstantFolder (second pass)}: Re-applied after loop optimizations to capture new constant opportunities (e.g., from unrolled loop computations).
+\end{itemize}
+
+Each pass processes a method's TAC instructions, producing an optimized list that \texttt{ProgramOptimizer} stores in a new \texttt{TACProgram}. The framework ensures modularity via the \texttt{OptimizationPass} interface, allowing additional passes to be integrated easily.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Constant Folding}: Evaluates and propagates constant expressions (e.g., integers, strings, booleans) at compile time, reducing runtime computations.
+    \item \textbf{Loop Optimization}: Applies LICM to hoist invariant code and unrolling to reduce loop overhead, improving performance for iterative constructs.
+    \item \textbf{Semantic Preservation}: Ensures optimizations (e.g., constant evaluation, instruction reordering) maintain program behavior, verified through CFG analysis.
+    \item \textbf{Modular Pipeline}: Supports multiple passes with \texttt{OptimizationPass}, enabling flexible and extensible optimization strategies.
+\end{itemize}
+
+\subsection{Example}
+For the sample program:
+\begin{lstlisting}
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
+\end{lstlisting}
+The original TAC for \texttt{main} (from Section~\ref{sec:tac}) is:
 \begin{lstlisting}
 t0 = load x
 t1 = t0 + 1
 y = t1
 t2 = y <= 50
 if t2 goto L0
+t3 = call Object.abort()
 goto L1
-L0: t3 = call Main.out_int(y)
-...
+L0:
+t4 = call IO.out_int(y)
+t5 = t4
+goto L1
+L1:
+return t5
 \end{lstlisting}
 
-\section{Visualization}
-\label{sec:visualization}
-
-\subsection{Purpose}
-Visualization generates PNG images of parse trees, ASTs, and CFGs to aid debugging and understanding (Sections 11, 13~\cite{cool_manual}). These graphics provide insights into the compiler's intermediate representations.
-
-\subsection{Background}
-Visualizations are implemented in the \texttt{visualization} package, using Graphviz to convert \texttt{.dot} files to PNGs. This phase enhances the compiler's educational value by making internal structures visible. Challenges include representing complex trees and graphs clearly.
-
-\subsection{Implementation}
-Key classes:
-\begin{itemize}[leftmargin=*]
-    \item \texttt{ParseTreeVisualizer.java}: Traverses parse trees to generate \texttt{.dot} files.
-    \item \texttt{ASTVisualizer.java}: Represents AST nodes and edges.
-    \item \texttt{CFGVisualizer.java}: Builds CFGs from TAC basic blocks.
-    \item \texttt{DotToImageConverter.java}: Executes Graphviz \texttt{dot} commands.
-\end{itemize}
-
-Example for parse tree:
-
-\begin{lstlisting}
-public class ParseTreeVisualizer {
-    public void visualize(ParseTree tree, String outputFile) {
-        dot.append("digraph ParseTree {\n");
-        visit(tree, 0);
-        dot.append("}\n");
-        try (PrintWriter writer = new PrintWriter(outputFile)) {
-            writer.println(dot.toString());
-        }
-    }
-}
-\end{lstlisting}
-
-\subsubsection{Design Decisions}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Graphviz Integration}: Leverages \texttt{dot} for high-quality graphics.
-    \item \textbf{Hierarchical Representation}: Ensures clear node relationships.
-    \item \textbf{Error Handling}: Manages I/O and Graphviz errors.
-\end{itemize}
-
-\subsection{Features}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Comprehensive Visuals}: Covers syntax, semantics, and control flow.
-    \item \textbf{PNG Output}: Cross-platform compatible.
-    \item \textbf{Debugging Aid}: Highlights structural issues.
-\end{itemize}
-
-\subsection{Example}
-For the example program, visualizations show parse tree nodes for \texttt{class}, AST nodes for \texttt{LetNode}, and CFG blocks with control flow edges.
-
-\section{Optimization}
-\label{sec:optimization}
-
-\subsection{Purpose}
-Optimization improves TAC efficiency, reducing runtime overhead while preserving semantics (Section 13~\cite{cool_manual}). This phase enhances performance for SPIM execution.
-
-\subsection{Background}
-Optimizations include constant folding and loop optimizations, implemented in \texttt{ProgramOptimizer.java}. The goal is to minimize instruction counts and improve control flow. Challenges include ensuring semantic equivalence and identifying optimization opportunities.
-
-\subsection{Implementation}
-\texttt{ProgramOptimizer.java} applies multiple passes:
-
-\begin{lstlisting}
-public class ProgramOptimizer {
-    public ProgramOptimizer() {
-        passes.add(new ConstantFolder());
-        passes.add(new LoopOptimizer());
-    }
-}
-\end{lstlisting}
+The optimizations applied by \texttt{ProgramOptimizer} include:
 
 \begin{itemize}[leftmargin=*]
-    \item \textbf{ConstantFolder}: Evaluates constant expressions (e.g., \texttt{2 + 3 = 5}).
-    \item \textbf{LoopOptimizer}: Applies loop-invariant code motion (LICM) and unrolling, using \texttt{LoopAnalyzer} to identify loops.
+    \item \textbf{ConstantFolder (first pass)}: Since \texttt{x} is initialized to \texttt{42}, \texttt{t0 = load x} loads \texttt{42}, and \texttt{t1 = t0 + 1} becomes \texttt{t1 = 42 + 1}, folding to \texttt{t1 = 43}. Thus, \texttt{y = t1} becomes \texttt{y = 43}, and \texttt{t2 = y <= 50} becomes \texttt{t2 = 43 <= 50}, folding to \texttt{t2 = true}. The optimized TAC is:
+        \begin{lstlisting}
+        y = 43
+        t2 = true
+        if t2 goto L0
+        t3 = call Object.abort()
+        goto L1
+        L0:
+        t4 = call IO.out_int(43)
+        t5 = t4
+        goto L1
+        L1:
+        return t5
+        \end{lstlisting}
+    \item \textbf{LoopOptimizer}: \texttt{LoopAnalyzer} finds no loops (no \texttt{WhileNode} or back-edges), so LICM and unrolling are not applied.
+    \item \textbf{ConstantFolder (second pass)}: Since \texttt{t2 = true}, the \texttt{if t2 goto L0} is always taken, but further constant folding is limited as \texttt{out\_int} and \texttt{abort} are method calls. The TAC remains largely unchanged, though dead code elimination (not implemented) could remove the unreachable \texttt{t3 = call Object.abort()} branch.
 \end{itemize}
 
-\subsubsection{Design Decisions}
+The optimized TAC simplifies constant expressions (e.g., \texttt{y = 43}, \texttt{t2 = true}), reducing runtime computations while preserving the conditional's semantics.
 
+\subsection{Design Decisions}
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Multiple Passes}: Allows iterative optimization.
-    \item \textbf{Semantic Checks}: Ensures transformations preserve behavior.
-    \item \textbf{Modularity}: Separate classes for each optimization.
+    \item \textbf{Pass-Based Design}: Uses \texttt{OptimizationPass} interface for modularity, allowing sequential application of \texttt{ConstantFolder} and \texttt{LoopOptimizer}.
+    \item \textbf{Control Flow Analysis}: Employs \texttt{LoopAnalyzer} to build CFGs and detect loops, enabling precise LICM and unrolling.
+    \item \textbf{Safe Optimizations}: Restricts transformations to constant propagation and loop restructuring, ensuring semantic equivalence via \texttt{isInvariant} checks and temporary renaming.
+    \item \textbf{Multiple Passes}: Re-applies \texttt{ConstantFolder} after \texttt{LoopOptimizer} to capture new optimization opportunities, balancing efficiency and simplicity.
 \end{itemize}
-
-\subsection{Features}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Constant Folding}: Reduces constant computations.
-    \item \textbf{Loop Optimizations}: Improves loop performance.
-    \item \textbf{Semantic Safety}: Maintains program correctness.
-\end{itemize}
-
-\subsection{Example}
-For:
-\begin{lstlisting}
-let x : Int <    \item 2 + 3 in while i < 10 loop out_int(x) pool
-\end{lstlisting}
-optimized TAC is:
-\begin{lstlisting}
-x = 5
-L_preheader: t2 = x
-L0: t1 = i < 10
-...
-\end{lstlisting}
 
 \section{Code Generation}
 \label{sec:codegen}
 
 \subsection{Purpose}
-Code generation translates optimized TAC to MIPS assembly for SPIM execution (Section 2~\cite{cool_manual}). It maps TAC instructions to MIPS instructions, supporting COOL's object model.
+Code generation translates Three-Address Code (TAC) into MIPS assembly code executable by the SPIM simulator, as specified in Section 2~\cite{cool_manual}, enabling runtime execution of COOL programs.
 
 \subsection{Background}
-Implemented in \texttt{CodeGenerator.java}, this phase uses \texttt{ClassTable} for metadata and manages registers and stack. Challenges include implementing dispatch tables and ensuring type safety in assembly.
+Implemented in \texttt{CodeGenerator.java}, this phase leverages \texttt{ClassTable} for type and method information and manages a limited register pool. Key challenges include implementing COOL's object-oriented features (e.g., dispatch tables, attribute access), ensuring type safety, and handling register spilling to the stack for complex expressions.
 
 \subsection{Implementation}
-\texttt{CodeGenerator.java} generates \texttt{AssemblyProgram.java} output:
+The code generation phase, defined in \texttt{CodeGenerator.java}, translates a \texttt{TACProgram} into an \texttt{AssemblyProgram}, which organizes MIPS instructions by class and method. The main entry point is:
 
 \begin{lstlisting}
-public class CodeGenerator {
-    public CodeGenerator(ClassTable classTable) {
-        this.program = new AssemblyProgram();
-        this.classTable = classTable;
-        this.freeRegisters = new LinkedHashSet<>(Arrays.asList("$r2", "$r3", ...));
+public AssemblyProgram generate(TACProgram tacProgram) {
+    for (String className : tacProgram.getClassMethods().keySet()) {
+        currentClass = className;
+        for (Map.Entry<String, List<TACInstruction>> entry : methods.entrySet()) {
+            currentMethod = entry.getKey();
+            currentInstructions = new ArrayList<>();
+            generateMethod(entry.getValue());
+            program.addMethod(className, currentMethod, currentInstructions);
+        }
     }
+    return program;
 }
 \end{lstlisting}
 
-\subsubsection{Design Decisions}
+The \texttt{CodeGenerator} maintains state for the current class, method, and instruction list, using a register pool (\texttt{\$r2} to \texttt{\$r15}) and a stack offset for spilling. Key components include:
 
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Register Allocation}: Uses a simple free-register pool.
-    \item \textbf{Dispatch Tables}: Implements method dispatch for inheritance.
-    \item \textbf{Stack Management}: Handles local variables and calls.
+    \item \textbf{Register Allocation}: The \texttt{allocateRegister} method assigns TAC temporaries to registers via \texttt{registerMap}. If no registers are available in \texttt{freeRegisters}, it spills to the stack (e.g., \texttt{4(\$fp)}), incrementing \texttt{stackOffset}. \texttt{freeRegister} reclaims registers when temporaries are no longer needed.
+    \item \textbf{Method Generation}: \texttt{generateMethod} emits a prologue (\texttt{push \$fp; move \$fp, \$sp}), translates TAC instructions, and adds an epilogue (\texttt{move \$sp, \$fp; pop \$fp; ret}) for methods without explicit returns.
+    \item \textbf{TAC Translation}: The \texttt{translateTAC} method maps TAC opcodes to MIPS instructions:
+        \begin{itemize}
+            \item \texttt{ASSIGN}: \texttt{MoveInst} (e.g., \texttt{move \$r2, \$r3}).
+            \item \texttt{BINARY}: \texttt{BinaryInst} for arithmetic (\texttt{add \$r2, \$r3, \$r4}) or comparison (\texttt{cmp} followed by \texttt{blt}/\texttt{ble}/\texttt{beq} with labels for \texttt{<}, \texttt{<=}, \texttt{=}).
+            \item \texttt{UNARY}: \texttt{UnaryInst} (e.g., \texttt{neg \$r2, \$r3} for \texttt{\textasciitilde}).
+            \item \texttt{LABEL}/\texttt{GOTO}/\texttt{IF}: \texttt{LabelInst}, \texttt{JumpInst}, \texttt{BranchInst} (e.g., \texttt{bne \$r2, L0}).
+            \item \texttt{CALL}: \texttt{CallInst}, pushing arguments (\texttt{PushInst}) and adjusting the stack (\texttt{PopInst}).
+            \item \texttt{RETURN}: \texttt{ReturnInst} with epilogue.
+            \item \texttt{PARAM}: \texttt{PopInst} to retrieve parameters.
+            \item \texttt{LOAD}/\texttt{STORE}: \texttt{LoadInst}/\texttt{StoreInst} for attributes (e.g., \texttt{lw \$r2, attr(\$fp)}).
+        \end{itemize}
+    \item \textbf{AssemblyProgram}: Defined in \texttt{AssemblyProgram.java}, stores instructions in a nested map (\texttt{class -> method -> instructions}) and formats output with \texttt{.class}, \texttt{.method}, and \texttt{.end\_method} directives via \texttt{toString}.
+    \item \textbf{Instruction}: Abstract base class in \texttt{Instruction.java}, defines \texttt{opcode} and \texttt{lineNumber}, with subclasses (e.g., \texttt{MoveInst}, \texttt{BinaryInst}) implementing \texttt{toString} for MIPS syntax.
 \end{itemize}
 
+The generator uses \texttt{ClassTable} to resolve method and attribute offsets, ensuring accurate dispatch and access. Instructions include line numbers for debugging, and stack management supports local variables and method calls.
 
 \subsection{Features}
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Full TAC Support}: Translates all instructions.
-    \item \textbf{Object-Oriented Features}: Supports inheritance and dispatch.
-    \item \textbf{SPIM Compatibility}: Produces executable code.
+    \item \textbf{TAC Translation}: Maps all TAC opcodes to MIPS instructions, supporting arithmetic, control flow, and method calls.
+    \item \textbf{Object Support}: Implements COOL's object model with attribute access (\texttt{LOAD}/\texttt{STORE}) and method dispatch (\texttt{CALL}).
+    \item \textbf{Type Safety}: Uses \texttt{ClassTable} to ensure correct method and attribute resolution, preventing runtime errors.
+    \item \textbf{SPIM Compatibility}: Produces assembly code with proper prologue/epilogue and stack management, executable on SPIM.
+\end{itemize}
+
+\subsection{Example}
+For the sample program:
+\begin{lstlisting}
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
+\end{lstlisting}
+The optimized TAC for \texttt{main} (from Section~\ref{sec:optimization}) is:
+\begin{lstlisting}
+y = 43
+t2 = true
+if t2 goto L0
+t3 = call Object.abort()
+goto L1
+L0:
+t4 = call IO.out_int(43)
+t5 = t4
+goto L1
+L1:
+return t5
+\end{lstlisting}
+
+The \texttt{CodeGenerator} produces the following MIPS assembly for \texttt{main} (simplified):
+\begin{lstlisting}
+.class Main
+.method main
+    push $fp
+    move $fp, $sp
+    move $r2, 43           # y = 43
+    move $r3, 1            # t2 = true
+    bne $r3, L0            # if t2 goto L0
+    jal Object_abort       # t3 = call Object.abort()
+    j L1
+L0:
+    push $r2               # push y (43)
+    jal IO_out_int         # t4 = call IO.out_int(43)
+    pop                    # adjust $sp
+    move $r4, $v0          # t5 = t4 ($v0 is return register)
+    j L1
+L1:
+    move $sp, $fp
+    pop $fp
+    ret                    # return t5 ($v0)
+.end_method
+.end_class
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Prologue}: \texttt{push \$fp; move \$fp, \$sp} sets up the stack frame.
+    \item \textbf{Assignments}: \texttt{move \$r2, 43} for \texttt{y = 43}, \texttt{move \$r3, 1} for \texttt{t2 = true}, using \texttt{allocateRegister} to map \texttt{y} to \texttt{\$r2}, \texttt{t2} to \texttt{\$r3}.
+    \item \textbf{Conditional}: \texttt{bne \$r3, L0} for \texttt{if t2 goto L0}, since \texttt{t2 = true} ensures the branch is taken.
+    \item \textbf{Calls}: \texttt{jal Object\_abort} for \texttt{abort()}, \texttt{push \$r2; jal IO\_out\_int; pop} for \texttt{out\_int(43)}, with \texttt{\$r2} holding \texttt{y}.
+    \item \textbf{Return}: \texttt{move \$r4, \$v0} for \texttt{t5 = t4}, followed by epilogue and \texttt{ret}.
+\end{itemize}
+
+The assembly reflects register allocation (\texttt{\$r2}, \texttt{\$r3}, \texttt{\$r4}), stack management, and SPIM-compatible syntax.
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Register Allocation}: Uses a \texttt{freeRegisters} pool and spills to stack when exhausted, balancing performance and resource constraints.
+    \item \textbf{Dispatch Tables}: Relies on \texttt{ClassTable} for method resolution, supporting inheritance and dynamic dispatch.
+    \item \textbf{Stack Management}: Implements prologue/epilogue and parameter passing via stack, ensuring robust method calls and local variable handling.
+    \item \textbf{Line Number Tracking}: Embeds \texttt{lineNumber} in instructions for debugging, aligning with TAC.
 \end{itemize}
 
 \section{Main Workflow}
 \label{sec:workflow}
 
 \subsection{Purpose}
-The main workflow orchestrates the compiler pipeline, processing \texttt{.cl} files to produce outputs.
+The main workflow orchestrates the COOL compiler pipeline, processing \texttt{.cl} source files to produce assembly code, intermediate representations, visualizations, and error reports, as described in Sections 2, 11, and 13~\cite{cool_manual}.
 
 \subsection{Implementation}
-\texttt{Main.java} scans \texttt{samples} and applies each phase:
+Implemented in \texttt{Main.java}, the workflow processes all \texttt{.cl} files in the \texttt{samples} directory recursively. The main entry point is:
 
 \begin{lstlisting}
-public class Main {
-    public static void main(String[] args) {
-        Path samplesDir = Paths.get("samples");
-        Files.walk(samplesDir).filter(path -> path.toString().endsWith(".cl")).forEach(inputFile -> {
-            // Lexing, parsing, AST, semantic analysis, TAC, visualization, optimization, codegen
-        });
+public static void main(String[] args) {
+    Path samplesDir = Paths.get("samples");
+    List<Path> coolFiles = new ArrayList<>();
+    Files.walk(samplesDir)
+            .filter(path -> path.toString().endsWith(".cl"))
+            .forEach(coolFiles::add);
+    for (Path inputFile : coolFiles) {
+        // Pipeline: lexing, parsing, AST, semantic analysis, TAC, CFG, optimization, codegen
     }
 }
 \end{lstlisting}
 
-\subsection{Features}
+For each \texttt{.cl} file, the pipeline performs the following steps:
+
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Batch Processing}: Handles multiple files.
-    \item \textbf{Error Handling}: Logs errors to \texttt{.errors} files.
-    \item \textbf{Visualization Support}: Generates diagnostic graphics.
+    \item \textbf{Lexing and Parsing}: Uses \texttt{CoolLexer} and \texttt{CoolParser} (from \texttt{parser} package) with ANTLR's \texttt{CharStreams} and \texttt{CommonTokenStream}. A \texttt{BailErrorStrategy} ensures parsing halts on syntax errors, producing a \texttt{ParseTree} for valid input.
+    \item \textbf{Parse Tree Visualization}: \texttt{ParseTreeVisualizer} generates a \texttt{.parse.dot} file, converted to \texttt{.parse.png} by \texttt{DotToImageConverter}, visualizing the syntactic structure.
+    \item \textbf{AST Construction}: \texttt{ASTBuilder} transforms the \texttt{ParseTree} into a \texttt{ProgramNode}, representing the abstract syntax.
+    \item \textbf{AST Visualization}: \texttt{ASTVisualizer} produces a \texttt{.ast.dot} file, converted to \texttt{.ast.png}, depicting the semantic structure.
+    \item \textbf{Semantic Analysis}: \texttt{SemanticAnalyzer} checks the AST for type and scoping errors, producing a \texttt{ClassTable} and \texttt{SymbolTable}. Errors are written to a \texttt{.errors} file, and processing stops if errors are found.
+    \item \textbf{TAC Generation}: \texttt{TACGenerator} converts the AST to a \texttt{TACProgram}, written to a \texttt{.tac} file, using \texttt{ClassTable} and \texttt{SymbolTable} for context.
+    \item \textbf{CFG Visualization}: \texttt{CFGVisualizer} generates a \texttt{.cfg.dot} file for the TAC, converted to \texttt{.cfg.png}, illustrating control flow.
+    \item \textbf{Optimization}: \texttt{ProgramOptimizer} applies constant folding and loop optimizations, producing an optimized \texttt{TACProgram}, written to a \texttt{.opt.tac} file.
+    \item \textbf{Code Generation}: \texttt{CodeGenerator} translates the optimized \texttt{TACProgram} to an \texttt{AssemblyProgram}, written to a \texttt{.asm} file, using \texttt{ClassTable} for MIPS code generation.
+    \item \textbf{Error Handling}: Exceptions during processing (e.g., I/O errors, parsing failures) are caught, with details written to a \texttt{.errors} file alongside stack traces.
 \end{itemize}
+
+The workflow uses \texttt{java.nio.file} for file handling, ensuring robust directory traversal and output file management. Each phase's output is saved in the same directory as the input file, with filenames derived from the base name (e.g., \texttt{test.cl} produces \texttt{test.asm}, \texttt{test.tac}).
+
+\subsection{Example}
+For the sample program in \texttt{samples/test.cl}:
+\begin{lstlisting}
+class Main inherits IO {
+    x : Int <- 42;
+    main() : Object {
+        let y : Int <- x + 1 in
+        if y <= 50 then out_int(y) else abort() fi
+    };
+};
+\end{lstlisting}
+The workflow generates the following files in \texttt{samples}:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{\texttt{test.parse.dot}, \texttt{test.parse.png}}: Parse tree visualization, with nodes for \texttt{program}, \texttt{class}, \texttt{let}, \texttt{if}, etc., labeled with rule names and token text (e.g., \texttt{TYPE(Main)}, \texttt{INT(42)}).
+    \item \textbf{\texttt{test.ast.dot}, \texttt{test.ast.png}}: AST visualization, showing \texttt{Program}, \texttt{Class: Main}, \texttt{Attribute: x}, \texttt{Method: main}, \texttt{Let}, \texttt{IfElse}, with attributes like line numbers and types.
+    \item \textbf{\texttt{test.errors}} (if errors): Semantic error messages (e.g., type mismatches) if analysis fails; empty for the sample program.
+    \item \textbf{\texttt{test.tac}}: TAC for \texttt{main}, e.g.:
+        \begin{lstlisting}
+        class Main:
+          method main:
+            t0 = load x
+            t1 = t0 + 1
+            y = t1
+            t2 = y <= 50
+            if t2 goto L0
+            t3 = call Object.abort()
+            goto L1
+            L0:
+            t4 = call IO.out_int(y)
+            t5 = t4
+            goto L1
+            L1:
+            return t5
+        \end{lstlisting}
+    \item \textbf{\texttt{test.cfg.dot}, \texttt{test.cfg.png}}: CFG visualization, with basic blocks for the \texttt{let}, \texttt{if}, and branches, connected by control flow edges.
+    \item \textbf{\texttt{test.opt.tac}}: Optimized TAC, e.g.:
+        \begin{lstlisting}
+        class Main:
+          method main:
+            y = 43
+            t2 = true
+            if t2 goto L0
+            t3 = call Object.abort()
+            goto L1
+            L0:
+            t4 = call IO.out_int(43)
+            t5 = t4
+            goto L1
+            L1:
+            return t5
+        \end{lstlisting}
+    \item \textbf{\texttt{test.asm}}: MIPS assembly, e.g.:
+        \begin{lstlisting}
+        .class Main
+        .method main
+            push $fp
+            move $fp, $sp
+            move $r2, 43
+            move $r3, 1
+            bne $r3, L0
+            jal Object_abort
+            j L1
+        L0:
+            push $r2
+            jal IO_out_int
+            pop
+            move $r4, $v0
+            j L1
+        L1:
+            move $sp, $fp
+            pop $fp
+            ret
+        .end_method
+        .end_class
+        \end{lstlisting}
+\end{itemize}
+
+The workflow ensures all outputs are generated in the \texttt{samples} directory, with visualizations aiding debugging and the \texttt{.asm} file ready for SPIM execution.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-This COOL compiler fully implements the language specification~\cite{cool_manual}, producing type-safe MIPS assembly and visualizations. Future work could explore advanced optimizations and cross-platform code generation.
+This COOL compiler implements the language specification~\cite{cool_manual}, producing type-safe MIPS assembly and visualizations. Future work could include advanced optimizations and cross-platform support.
 
 \begin{thebibliography}{1}
 \bibitem{cool_manual}
-The Cool Reference Manual, CS164, University of California, Berkeley, 2025.
+The COOL Reference Manual, CS164, University of California, Berkeley, 2025.
 \end{thebibliography}
 
 \end{document}

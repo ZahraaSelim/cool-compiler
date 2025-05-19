@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.22.0 (TeX Live 2026/dev/Arch Linux)  (format=lualatex 2025.3.23)  19 MAY 2025 22:25
+This is LuaHBTeX, Version 1.22.0 (TeX Live 2026/dev/Arch Linux)  (format=lualatex 2025.3.23)  19 MAY 2025 23:16
  restricted system commands enabled.
  file:line:error style messages enabled.
 **"/mnt/shared/Academic/School/CSE422 - Programming Languages and Compilers/Project/report/report"
@@ -575,36 +575,131 @@ File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 [5]
 
 [6]
-Overfull \hbox (44.00772pt too wide) in paragraph at lines 243--244
-\T1/lmr/m/n/10.95 The parser, de-fined in \T1/lmtt/m/n/10.95 CoolParser.g4\T1/lmr/m/n/10.95 , gen-er-ates \T1/lmtt/m/n/10.95 CoolParser.java\T1/lmr/m/n/10.95 , which con-sumes to-kens from \T1/lmtt/m/n/10.95 CoolLexer.java\T1/lmr/m/n/10.95 .
- []
-
-
 
 [7]
-
-[8]
-
-[9]
-Overfull \hbox (69.85419pt too wide) in paragraph at lines 343--344
-\T1/lmr/m/n/10.95 The \T1/lmtt/m/n/10.95 SemanticAnalyzer \T1/lmr/m/n/10.95 uses \T1/lmtt/m/n/10.95 ClassTable \T1/lmr/m/n/10.95 (\T1/lmtt/m/n/10.95 ClassTable.java\T1/lmr/m/n/10.95 ) for class meta-data and \T1/lmtt/m/n/10.95 SymbolTable \T1/lmr/m/n/10.95 (\T1/lmtt/m/n/10.95 SymbolTable.java\T1/lmr/m/n/10.95 )
+Overfull \hbox (21.73505pt too wide) in paragraph at lines 280--281
+\T1/lmtt/m/n/10.95 exprList \T1/lmr/m/n/10.95 de-fines comma-separated ar-gu-ment lists, \T1/lmtt/m/n/10.95 letDecl \T1/lmr/m/n/10.95 spec-i-fies let vari-able dec-la-ra-tions, and \T1/lmtt/m/n/10.95 caseBranch
  []
 
 
+
+[8]
+Overfull \hbox (17.31226pt too wide) in paragraph at lines 306--307
+[]\T1/lmtt/m/n/10.95 class\T1/lmr/m/n/10.95 : La-beled as \T1/lmtt/m/n/10.95 class\T1/lmr/m/n/10.95 , with \T1/lmtt/m/n/10.95 TYPE(Main)\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 INHERITS IO\T1/lmr/m/n/10.95 , and fea-tures \T1/lmtt/m/n/10.95 attribute(x) \T1/lmr/m/n/10.95 and \T1/lmtt/m/n/10.95 method(main)\T1/lmr/m/n/10.95 . 
+ []
+
+
+
+[9]
 
 [10]
 
 [11]
+Overfull \hbox (9.87263pt too wide) in paragraph at lines 390--391
+[]\T1/lmtt/m/n/10.95 visitIdentifier\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 visitInteger\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 visitString\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 visitTrue\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 visitFalse\T1/lmr/m/n/10.95 : Pro-duces leaf nodes (\T1/lmtt/m/n/10.95 IdNode\T1/lmr/m/n/10.95 ,
+ []
+
+
 
 [12]
+Overfull \hbox (7.64172pt too wide) in paragraph at lines 422--423
+[]\T1/lmtt/m/n/10.95 LetNode \T1/lmr/m/n/10.95 (line 4): Con-tains one \T1/lmtt/m/n/10.95 LetDeclNode(y) \T1/lmr/m/n/10.95 (type \T1/lmtt/m/n/10.95 Int\T1/lmr/m/n/10.95 , ini-tial-izer \T1/lmtt/m/n/10.95 BinaryOpNode(+) \T1/lmr/m/n/10.95 with \T1/lmtt/m/n/10.95 IdNode(x)
+ []
+
+
+Overfull \hbox (23.10992pt too wide) in paragraph at lines 423--424
+[]\T1/lmtt/m/n/10.95 IfElseNode \T1/lmr/m/n/10.95 (line 5): Con-di-tion \T1/lmtt/m/n/10.95 BinaryOpNode(<=) \T1/lmr/m/n/10.95 (\T1/lmtt/m/n/10.95 IdNode(y)\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 IntNode(50)\T1/lmr/m/n/10.95 ), then branch \T1/lmtt/m/n/10.95 DispatchNode
+ []
+
+
 
 [13]
+Overfull \hbox (55.76717pt too wide) in paragraph at lines 445--446
+\T1/lmr/m/n/10.95 The se-man-tic anal-y-sis phase is or-ches-trated by \T1/lmtt/m/n/10.95 SemanticAnalyzer.java\T1/lmr/m/n/10.95 , which im-ple-ments the \T1/lmtt/m/n/10.95 ASTVisitor<String>
+ []
+
+
+Overfull \hbox (15.2164pt too wide) in paragraph at lines 448--449
+\T1/lmr/m/n/10.95 her-i-tance from ba-sic classes (\T1/lmtt/m/n/10.95 Int\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 Bool\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 String\T1/lmr/m/n/10.95 ), and cyclic in-her-i-tance. The \T1/lmtt/m/n/10.95 checkFeatureRedefinition
+ []
+
+
 
 [14]
 
 [15]
+Overfull \hbox (2.36447pt too wide) in paragraph at lines 521--522
+[]\T1/lmr/bx/n/10.95 SELF_TYPE Han-dling\T1/lmr/m/n/10.95 : Dy-nam-i-cally re-solves \T1/lmtt/m/n/10.95 SELF_TYPE \T1/lmr/m/n/10.95 us-ing \T1/lmtt/m/n/10.95 currentClass\T1/lmr/m/n/10.95 , sup-port-ing COOL's
+ []
 
-[16] (./report.aux)
+
+
+[16]
+
+[17]
+Overfull \hbox (56.70108pt too wide) in paragraph at lines 579--580
+[]\T1/lmtt/m/n/10.95 visitAssignment\T1/lmr/m/n/10.95 : Emits \T1/lmtt/m/n/10.95 AssignTAC \T1/lmr/m/n/10.95 for lo-cal vari-ables or \T1/lmtt/m/n/10.95 StoreTAC \T1/lmr/m/n/10.95 for at-tributes, based on \T1/lmtt/m/n/10.95 SymbolTable.lookup\T1/lmr/m/n/10.95 . 
+ []
+
+
+
+[18]
+Overfull \hbox (14.84583pt too wide) in paragraph at lines 625--626
+[]\T1/lmtt/m/n/10.95 visitIfElse\T1/lmr/m/n/10.95 : Gen-er-ates \T1/lmtt/m/n/10.95 t2 = y <= 50; if t2 goto L0 \T1/lmr/m/n/10.95 for the con-di-tion, \T1/lmtt/m/n/10.95 t3 = call Object.abort()
+ []
+
+
+
+[19
+Missing character: There is no – (U+2013) in font ec-lmr10!
+]
+
+[20]
+Overfull \hbox (3.56435pt too wide) in paragraph at lines 697--698
+[]\T1/lmtt/m/n/10.95 IfElse \T1/lmr/m/n/10.95 (line 5): Chil-dren \T1/lmtt/m/n/10.95 BinaryOp: <= \T1/lmr/m/n/10.95 (\T1/lmtt/m/n/10.95 Id: y\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 Int: 50\T1/lmr/m/n/10.95 ), \T1/lmtt/m/n/10.95 Dispatch: out_int \T1/lmr/m/n/10.95 (\T1/lmtt/m/n/10.95 Id: self\T1/lmr/m/n/10.95 ,
+ []
+
+
+
+[21]
+
+[22]
+
+[23]
+
+[24]
+Overfull \hbox (29.98029pt too wide) in paragraph at lines 843--844
+\T1/lmr/m/n/10.95 The code gen-er-a-tion phase, de-fined in \T1/lmtt/m/n/10.95 CodeGenerator.java\T1/lmr/m/n/10.95 , trans-lates a \T1/lmtt/m/n/10.95 TACProgram \T1/lmr/m/n/10.95 into an \T1/lmtt/m/n/10.95 AssemblyProgram\T1/lmr/m/n/10.95 ,
+ []
+
+
+
+[25]
+Overfull \hbox (25.89828pt too wide) in paragraph at lines 868--869
+[]\T1/lmtt/m/n/10.95 BINARY\T1/lmr/m/n/10.95 : \T1/lmtt/m/n/10.95 BinaryInst \T1/lmr/m/n/10.95 for arith-metic (\T1/lmtt/m/n/10.95 add $r2, $r3, $r4\T1/lmr/m/n/10.95 ) or com-par-i-son (\T1/lmtt/m/n/10.95 cmp \T1/lmr/m/n/10.95 fol-lowed by \T1/lmtt/m/n/10.95 blt\T1/lmr/m/n/10.95 /\T1/lmtt/m/n/10.95 ble\T1/lmr/m/n/10.95 /\T1/lmtt/m/n/10.95 beq
+ []
+
+
+
+[26]
+
+[27]
+Overfull \hbox (18.69308pt too wide) in paragraph at lines 985--986
+[]\T1/lmr/bx/n/10.95 Parse Tree Vi-su-al-iza-tion\T1/lmr/m/n/10.95 : \T1/lmtt/m/n/10.95 ParseTreeVisualizer \T1/lmr/m/n/10.95 gen-er-ates a \T1/lmtt/m/n/10.95 .parse.dot \T1/lmr/m/n/10.95 file, con-verted to \T1/lmtt/m/n/10.95 .parse.png
+ []
+
+
+
+[28]
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10.95> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 1012.
+
+
+[29]
+
+[30]
+
+[31] (./report.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -616,24 +711,28 @@ Package rerunfilecheck Warning: File `report.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `report.out':
-(rerunfilecheck)             Before: 48B9CF2E4108FA33158AE98AAE19A504;8929
-(rerunfilecheck)             After:  546FB6F59E711D56A892BE72EB39D0AB;8929.
+(rerunfilecheck)             Before: AA50A9115EFE234DAB2942A9EF6352DA;9600
+(rerunfilecheck)             After:  1E895C99776DAA2BC5D1DE197C0D3EB3;9357.
 )
 
 Here is how much of LuaTeX's memory you used:
- 14979 strings out of 475506
- 305527,794899 words of node,token memory allocated
+ 15222 strings out of 475506
+ 381933,794899 words of node,token memory allocated
  669 words of node memory still in use:
    6 hlist, 2 vlist, 2 rule, 2 glue, 4 kern, 1 glyph, 6 attribute, 89 glue_spec, 6 attribute_list, 1 write nodes
-   avail lists: 1:1,2:3123,3:456,4:124,5:9220,6:137,7:11014,8:1,9:15306,10:43,11:795
- 37470 multiletter control sequences out of 65536+600000
- 43 fonts using 2748711 bytes
- 72i,6n,75p,843b,828s stack positions out of 10000i,1000n,20000p,200000b,200000s
-{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}</usr/share/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt8.pfb>
-Output written on report.pdf (17 pages, 255548 bytes).
+   avail lists: 2:3768,3:456,4:216,5:10881,6:137,7:12127,8:3,9:18126,10:35,11:745
+ 37481 multiletter control sequences out of 65536+600000
+ 43 fonts using 2747751 bytes
+ 72i,6n,75p,1138b,958s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-PDF statistics: 679 PDF objects out of 1000 (max. 8388607)
- 646 compressed objects within 7 object streams
- 244 named destinations out of 1000 (max. 131072)
- 609 words of extra memory for PDF output out of 10000 (max. 100000000)
+warning  (pdf backend): unreferenced destination with name 'subsection.10.5'
+
+warning  (pdf backend): unreferenced destination with name 'subsection.10.4'
+{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}</usr/share/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
+Output written on report.pdf (32 pages, 306967 bytes).
+
+PDF statistics: 997 PDF objects out of 1000 (max. 8388607)
+ 946 compressed objects within 10 object streams
+ 476 named destinations out of 1000 (max. 131072)
+ 649 words of extra memory for PDF output out of 10000 (max. 100000000)
 
