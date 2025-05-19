@@ -1,0 +1,641 @@
+\documentclass[11pt, titlepage]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% Packages
+\usepackage{amsmath, amssymb, amsthm} % Math symbols and theorems
+\usepackage{graphicx} % Images
+\usepackage[letterpaper, top=0.8in, bottom=0.8in, left=0.8in, right=0.8in, heightrounded]{geometry} % Page margins
+\usepackage{listings} % Code listings
+\usepackage{caption} % Captions
+\usepackage{enumitem} % Customized lists
+\usepackage{hyperref} % Hyperlinks
+\usepackage{xcolor} % Colored text
+\usepackage{titling} % Title customization
+\usepackage{tocloft} % Table of contents customization
+
+% Configure listings for code
+\lstset{
+    basicstyle=\ttfamily\scriptsize, % Smaller font for listings
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    showspaces=false,
+    showstringspaces=false,
+    tabsize=2,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red},
+    escapeinside={(*@}{@*)},
+}
+
+% Page formatting
+\setlength{\parindent}{0pt} % No paragraph indentation
+\setlength{\parskip}{0.8em} % Paragraph spacing
+\setlength{\cftsecindent}{0em} % No indent for section titles in TOC
+\setlength{\cftsubsecindent}{2em} % Indent for subsections
+\renewcommand{\cfttoctitlefont}{\Large\bfseries} % Bold TOC title
+
+% Custom title format
+\pretitle{\begin{center}\Large\bfseries}
+\posttitle{\par\end{center}\vspace{0.5em}}
+\preauthor{\begin{center}\large}
+\postauthor{\par\end{center}}
+\predate{\begin{center}\small}
+\postdate{\end{center}}
+
+% Title, author, and date
+\title{CSE422: Programming Languages and Compilers\\COOL Compiler in Java\\Project Report}
+\author{Zahraa Selim (120210083)}
+\date{May 19, 2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+\label{sec:introduction}
+
+\subsection{Purpose}
+The Classroom Object-Oriented Language (COOL) is a statically typed, object-oriented language designed for educational purposes, as outlined in the COOL Reference Manual~\cite{cool_manual}. This project implements a compiler in Java that translates COOL source files (\texttt{.cl}) into MIPS assembly code (\texttt{.asm}) executable on the SPIM simulator. Beyond code generation, the compiler produces visualizations (parse trees, abstract syntax trees, and control flow graphs) to aid debugging and understanding. This report provides a comprehensive overview of the compiler's design, implementation, and features, detailing each phase of the compilation process.
+
+\subsection{Background}
+COOL supports classes, single inheritance, automatic memory management, and a rich expression-based syntax (Sections 3--7~\cite{cool_manual}). Its educational design emphasizes type safety, object-oriented programming, and compiler construction principles. The compiler pipeline mirrors a traditional compiler, with modular phases that handle lexical analysis, parsing, semantic checking, intermediate code generation, optimization, and final code generation. Visualizations enhance the ability to inspect intermediate representations, making the compiler a valuable learning tool.
+
+The pipeline includes:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Lexical Analysis}: Converts source code into tokens using ANTLR.
+    \item \textbf{Syntax Analysis}: Builds a parse tree to enforce syntactic rules.
+    \item \textbf{AST Construction}: Creates an abstract syntax tree for semantic analysis.
+    \item \textbf{Semantic Analysis}: Ensures type safety and semantic correctness.
+    \item \textbf{Intermediate Code Generation}: Produces Three-Address Code (TAC).
+    \item \textbf{Visualization}: Generates parse tree, AST, and CFG images.
+    \item \textbf{Optimization}: Improves TAC efficiency.
+    \item \textbf{Code Generation}: Translates TAC to MIPS assembly.
+\end{itemize}
+
+\subsection{Implementation}
+The compiler is implemented in Java, leveraging ANTLR 4 for lexical and syntax analysis, and custom Java classes for subsequent phases. Each phase is encapsulated in dedicated packages (e.g., \texttt{ast}, \texttt{tac}, \texttt{visualization}), promoting modularity and maintainability. The main workflow in \texttt{Main.java} orchestrates the pipeline, processing multiple \texttt{.cl} files and producing corresponding outputs.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Type Safety}: Enforces COOL's static typing rules (Section 4).
+    \item \textbf{Object-Oriented Support}: Handles classes, inheritance, and dispatch (Sections 3, 7.4).
+    \item \textbf{Visualizations}: Produces PNG images for debugging.
+    \item \textbf{SPIM Compatibility}: Generates executable MIPS code.
+    \item \textbf{Modularity}: Allows easy extension and maintenance.
+\end{itemize}
+
+\section{Lexical Analysis}
+\label{sec:lexical}
+
+\subsection{Purpose}
+Lexical analysis transforms COOL source code into a stream of tokens, as specified in Section 10 of the COOL Reference Manual~\cite{cool_manual}. This phase is critical as it simplifies subsequent parsing by breaking the input into meaningful units like keywords, identifiers, and operators. The lexer must handle COOL's lexical rules, including case sensitivity, nested comments, and error conditions like unterminated strings.
+
+\subsection{Background}
+COOL's lexical structure includes integers, identifiers, strings, comments, keywords, whitespace, and special symbols. The lexer, implemented in \texttt{CoolLexer.g4} using ANTLR 4, generates a Java lexer class that produces tokens for the parser. ANTLR was chosen for its robust grammar definition language and automatic error handling, which streamline lexer development. Challenges include handling case-insensitive keywords (except \texttt{true}/\texttt{false}) and nested multi-line comments, which require careful rule design.
+
+\subsection{Lexical Structure}
+
+\subsubsection{Integers and Identifiers}
+Integers are non-empty digit sequences (0--9) without leading zeros, except for 0 (Section 10.1). Identifiers include object identifiers (lowercase initial, e.g., \texttt{xcar}) and type identifiers (uppercase initial, e.g., \texttt{Cons}), with special identifiers \texttt{self} and \texttt{SELF\_TYPE}. The lexer rules in \texttt{CoolLexer.g4} are:
+
+\begin{lstlisting}
+INT       : [0-9]+ ;
+ID        : [a-z][a-zA-Z0-9_]* ;
+TYPE      : [A-Z][a-zA-Z0-9_]* ;
+SELF      : 'self' ;
+SELF_TYPE : 'SELF_TYPE' ;
+\end{lstlisting}
+
+These rules ensure integers exclude invalid formats (e.g., \texttt{0123}) and identifiers match COOL's naming conventions.
+
+\subsubsection{Strings}
+Strings (Section 10.2) are double-quoted ASCII sequences supporting escape sequences (\texttt{\textbackslash n}, \texttt{\textbackslash t}) and limited to 1024 characters. Unterminated strings trigger errors. The lexer rules handle content and errors:
+
+\begin{lstlisting}
+STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)* '"' ;
+fragment STRING_CONTENT : ~["\\\n\r] ;
+fragment ESCAPE_SEQUENCE : '\\' (['"\\] | 'b' | 't' | 'n' | 'f') ;
+UNTERMINATED_STRING : '"' (STRING_CONTENT | ESCAPE_SEQUENCE)* ('\n' | EOF) {
+    System.err.println("Error: Unterminated string at line " + getLine());
+} ;
+\end{lstlisting}
+
+The error rule ensures user-friendly diagnostics, a critical feature for educational use.
+
+\subsubsection{Comments}
+COOL supports single-line (\texttt{--}) and nested multi-line (\texttt{(* *)}) comments, skipped during tokenization (Section 10.3). The lexer uses non-greedy matching for nested comments:
+
+\begin{lstlisting}
+SINGLECOMMENT : '--' ~[\r\n]* -> skip ;
+MULTICOMMENT  : '(*' .*? '*)' -> skip ;
+\end{lstlisting}
+
+Non-greedy matching (\texttt{.*?}) ensures proper nesting, a challenge resolved by leveraging ANTLR's parsing capabilities.
+
+\subsubsection{Keywords}
+Keywords (e.g., \texttt{class}, \texttt{if}) are case-insensitive, except \texttt{true} and \texttt{false}, which require lowercase initials (Section 10.4). Fragments in \texttt{CoolLexer.g4} handle case insensitivity:
+
+\begin{lstlisting}
+CLASS : C L A S S ;
+TRUE  : 't' R U E ;
+FALSE : 'f' A L S E ;
+fragment C : [cC] ;
+fragment L : [lL] ;
+// ... other fragments
+\end{lstlisting}
+
+This approach avoids duplicating rules for each case variation, improving maintainability.
+
+\subsubsection{Whitespace and Operators}
+Whitespace (spaces, tabs, newlines) is ignored (Section 10.5), and operators (e.g., \texttt{+}, \texttt{<-}) are tokenized individually:
+
+\begin{lstlisting}
+WS : [ \t\r\n\f\u000B]+ -> skip ;
+PLUS  : '+' ;
+ARROW : '<-' ;
+DOT   : '.' ;
+\end{lstlisting}
+
+\subsection{Implementation}
+The lexer, defined in \texttt{CoolLexer.g4}, produces tokens integrated with the parser via a token stream. ANTLR generates a Java class (\texttt{CoolLexer.java}) that processes input character by character, applying the defined rules. Design decisions include:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Error Handling}: Custom error messages for unterminated strings enhance usability.
+    \item \textbf{Case Insensitivity}: Fragments reduce rule complexity for keywords.
+    \item \textbf{Nested Comments}: Non-greedy matching ensures correct parsing, a non-trivial task due to potential nesting depth.
+    \item \textbf{Performance}: Skipping whitespace and comments at the lexer level reduces parser workload.
+\end{itemize}
+
+Challenges included ensuring \texttt{true}/\texttt{false} case sensitivity and handling edge cases like empty strings or invalid escape sequences, resolved through rigorous testing against COOL's specification.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Comprehensive Tokenization}: Supports all COOL lexical elements.
+    \item \textbf{Error Reporting}: Detects and reports unterminated strings.
+    \item \textbf{Efficiency}: Skips irrelevant tokens (whitespace, comments).
+    \item \textbf{Integration}: Seamlessly feeds tokens to the parser.
+\end{itemize}
+
+\subsection{Example}
+For the input:
+\begin{lstlisting}
+class Main {
+    main() : Object {
+        let x : Int <    \item 42 in x + 1
+    };
+};
+\end{lstlisting}
+the lexer produces tokens like \texttt{CLASS}, \texttt{TYPE(Main)}, \texttt{ID(main)}, \texttt{LET}, \texttt{ID(x)}, \texttt{INT(42)}, \texttt{PLUS}, \texttt{INT(1)}, reflecting COOL's lexical structure.
+
+\section{Syntax Analysis}
+\label{sec:syntax}
+
+\subsection{Purpose}
+Syntax analysis constructs a parse tree from the token stream, ensuring the program adheres to COOL's grammar (Section 11~\cite{cool_manual}). This phase validates the syntactic structure, detecting errors like missing semicolons or malformed expressions before semantic analysis.
+
+\subsection{Background}
+COOL's grammar defines programs as class sequences, with classes containing attributes and methods, and expressions supporting complex constructs like dispatches and conditionals. The parser, implemented in \texttt{CoolParser.g4} using ANTLR 4, generates a labeled parse tree for AST construction. ANTLR was chosen for its ability to handle complex grammars and generate robust parsers. Challenges include encoding operator precedence and handling COOL's unique constructs like \texttt{SELF\_TYPE}.
+
+\subsection{Syntax Structure}
+
+\subsubsection{Program and Classes}
+A COOL program is one or more class definitions (Section 3), each with optional inheritance and features. The grammar in \texttt{CoolParser.g4} defines:
+
+\begin{lstlisting}
+program : class+ ;
+class   : CLASS TYPE (INHERITS TYPE)? LBRACE feature* RBRACE SEMICOLON ;
+\end{lstlisting}
+
+This structure ensures classes are well-formed and supports inheritance.
+
+\subsubsection{Features}
+Attributes and methods (Section 3.1) are defined as:
+
+\begin{lstlisting}
+feature : ID LPAREN (formal (COMMA formal)*)? RPAREN COLON (TYPE | SELF_TYPE) LBRACE expr RBRACE SEMICOLON  # Method
+        | ID COLON (TYPE | SELF_TYPE) (ARROW expr)? SEMICOLON                                        # Attribute ;
+formal  : ID COLON (TYPE | SELF_TYPE) ;
+\end{lstlisting}
+
+Attributes may include initialization, and methods support multiple parameters.
+
+\subsubsection{Expressions}
+Expressions (Section 7) include dispatches, conditionals, loops, and operators. The \texttt{expr} rule handles precedence:
+
+\begin{lstlisting}
+expr : expr (AT TYPE)? DOT ID LPAREN exprList? RPAREN  # Dispatch
+     | IF expr THEN expr ELSE expr FI                 # IfElse
+     | expr PLUS expr                                 # Addition
+     | ID                                             # Identifier
+     | INT                                            # Integer
+     // ... other expression types
+;
+\end{lstlisting}
+
+Precedence is encoded via rule ordering (Section 11.1), with \texttt{.} having the highest precedence.
+
+\subsection{Implementation}
+The parser, defined in \texttt{CoolParser.g4}, generates \texttt{CoolParser.java}, which consumes tokens from \texttt{CoolLexer.java}. Key design decisions:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Error Strategy}: \texttt{BailErrorStrategy} halts on syntax errors, providing immediate feedback.
+    \item \textbf{Labeled Alternatives}: Labels (e.g., \texttt{\# Dispatch}) simplify AST construction.
+    \item \textbf{Precedence Handling}: Rule structure ensures correct operator precedence and associativity.
+    \item \textbf{Token Integration}: \texttt{tokenVocab=CoolLexer} links lexer and parser.
+\end{itemize}
+
+Challenges included managing COOL's complex expression grammar and ensuring unambiguous parsing of nested constructs, addressed through careful rule design and testing.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Complete Grammar}: Supports all COOL constructs.
+    \item \textbf{Error Detection}: Reports syntax errors with line numbers.
+    \item \textbf{Precedence Accuracy}: Correctly handles operator precedence.
+    \item \textbf{Parse Tree Output}: Facilitates AST construction.
+\end{itemize}
+
+\subsection{Example}
+For:
+\begin{lstlisting}
+let x : Int <    \item 42 in if x < 50 then x + 1 else x fi
+\end{lstlisting}
+the parser builds a tree with nodes for \texttt{let}, \texttt{IfElse}, \texttt{BinaryOp(<)}, and \texttt{BinaryOp(+)}, preserving syntactic hierarchy.
+
+\section{Abstract Syntax Tree Construction}
+\label{sec:ast}
+
+\subsection{Purpose}
+AST construction transforms the parse tree into a semantic representation, abstracting syntactic details for type checking and code generation (Sections 3, 7, 11~\cite{cool_manual}). The AST simplifies subsequent phases by focusing on program meaning.
+
+\subsection{Background}
+The AST represents COOL programs hierarchically, with nodes for classes, features, and expressions. Implemented in \texttt{ASTBuilder.java}, it uses a visitor pattern to traverse the parse tree. The design prioritizes extensibility and error reporting, with challenges including handling \texttt{SELF\_TYPE} and maintaining line numbers for diagnostics.
+
+\subsection{AST Structure}
+The AST, in the \texttt{ast} package, uses \texttt{ASTNode} (\texttt{ASTNode.java}) as the base class, with fields for line numbers and a visitor method. Key nodes include:
+\begin{itemize}[leftmargin=*]
+    \item \texttt{ProgramNode}: List of \texttt{ClassNode}s.
+    \item \texttt{ClassNode}: Name, parent, features.
+    \item \texttt{MethodNode}: Parameters, return type, body.
+    \item \texttt{AttributeNode}: Name, type, optional initialization.
+    \item \texttt{ExpressionNode}: Subclasses like \texttt{DispatchNode}, \texttt{LetNode}, \texttt{BinaryOpNode}.
+\end{itemize}
+
+The \texttt{ASTVisitor} interface (\texttt{ASTVisitor.java}) supports extensible processing.
+
+\subsection{Implementation}
+\texttt{ASTBuilder.java} extends \texttt{CoolParserBaseVisitor<ASTNode>} to construct the AST. A key method is:
+
+\begin{lstlisting}
+public ProgramNode visitProgram(CoolParser.ProgramContext ctx) {
+    List<ClassNode> classes = new ArrayList<>();
+    for (CoolParser.ClassContext classCtx : ctx.class_()) {
+        classes.add((ClassNode) visit(classCtx));
+    }
+    return new ProgramNode(classes, ctx.start.getLine());
+}
+\end{lstlisting}
+
+\subsubsection{Design Decisions}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Visitor Pattern}: Enables modular processing for semantic analysis and code generation.
+    \item \textbf{Line Numbers}: Stored in each node for precise error reporting.
+    \item \textbf{Type Support}: Explicit handling of \texttt{SELF\_TYPE} in declarations.
+    \item \textbf{Simplification}: Omits syntactic tokens (e.g., semicolons) to focus on semantics.
+\end{itemize}
+
+Challenges included mapping complex parse tree nodes to streamlined AST nodes and ensuring \texttt{SELF\_TYPE} was correctly represented, resolved through a robust node hierarchy.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Semantic Focus}: Abstracts syntactic details.
+    \item \textbf{Extensibility}: Visitor pattern supports new analyses.
+    \item \textbf{Error Support}: Line numbers aid diagnostics.
+    \item \textbf{COOL Compliance}: Handles all language constructs.
+\end{itemize}
+
+\subsection{Example}
+For:
+\begin{lstlisting}
+class Main inherits IO {
+    x : Int <    \item 42;
+    main() : Object {
+        let y : Int <    \item x + 1 in out_int(y)
+    };
+};
+\end{lstlisting}
+the AST includes a \texttt{ProgramNode} with a \texttt{ClassNode(Main)}, containing an \texttt{AttributeNode(x)} and a \texttt{MethodNode(main)} with a \texttt{LetNode} and \texttt{MethodCallNode(out\_int)}.
+
+\section{Semantic Analysis}
+\label{sec:semantic}
+
+\subsection{Purpose}
+Semantic analysis ensures type safety and semantic correctness, preventing runtime errors (Sections 4, 5, 6, 12~\cite{cool_manual}). It validates inheritance, method signatures, and expression types, reporting errors for violations.
+
+\subsection{Background}
+COOL's type system requires static type checking, with rules for conformance, \texttt{SELF\_TYPE}, and method overriding. Implemented in \texttt{SemanticAnalyzer.java}, this phase uses symbol tables and class metadata to track scopes and types. Challenges include handling \texttt{SELF\_TYPE}'s dynamic typing and detecting inheritance cycles.
+
+\subsection{Implementation}
+The \texttt{SemanticAnalyzer} uses \texttt{ClassTable} (\texttt{ClassTable.java}) for class metadata and \texttt{SymbolTable} (\texttt{SymbolTable.java}) for variable scopes. The main method is:
+
+\begin{lstlisting}
+public List<String> analyze(ProgramNode program) {
+    for (ClassNode classNode : program.classes) {
+        classTable.addClass(classNode);
+    }
+    classTable.checkInheritance();
+    errors.addAll(classTable.getErrors());
+    program.accept(this);
+    return errors;
+}
+\end{lstlisting}
+
+\subsubsection{Key Components}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ClassTable}: Stores class names, parents, methods, and attributes, checking for cycles and illegal inheritance (e.g., \texttt{BASIC} classes).
+    \item \textbf{SymbolTable}: Manages nested scopes for variables, updated for \texttt{let} and method parameters.
+    \item \textbf{Type Checking}: Infers expression types using Section 12.2 rules, ensuring conformance.
+\end{itemize}
+    
+\subsubsection{Design Decisions}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Two-Pass Analysis}: First builds \texttt{ClassTable}, then checks expressions to handle forward references.
+    \item \textbf{Error Accumulation}: Collects all errors for comprehensive reporting.
+    \item \textbf{Visitor Pattern}: Traverses AST for type inference.
+\end{itemize}
+
+Challenges included implementing \texttt{SELF\_TYPE} conformance and ensuring method override rules (Section 6), resolved through detailed type inference algorithms.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Type Safety}: Prevents runtime type errors.
+    \item \textbf{Inheritance Validation}: Detects cycles and illegal parents.
+    \item \textbf{Method Checking}: Ensures override compatibility.
+    \item \textbf{Detailed Errors}: Provides line numbers and context.
+\end{itemize}
+
+\subsection{Example}
+For:
+\begin{lstlisting}
+let y : Int <    \item x + 1 in if y <= 50 then out_int(y) else abort() fi
+\end{lstlisting}
+the analyzer verifies \texttt{x : Int}, computes \texttt{x + 1 : Int}, \texttt{y <= 50 : Bool}, and checks \texttt{out\_int} and \texttt{abort} dispatches, determining the \texttt{if} type as \texttt{Object}.
+
+\section{Intermediate Code Generation}
+\label{sec:tac}
+
+\subsection{Purpose}
+Intermediate code generation produces Three-Address Code (TAC) from the AST, serving as a platform-independent representation for optimization and code generation (Section 13~\cite{cool_manual}). TAC simplifies complex expressions into three-operand instructions.
+
+\subsection{Background}
+TAC is a low-level representation where each instruction has at most three operands, making it ideal for optimization and translation to assembly. Implemented in \texttt{TACGenerator.java}, this phase handles COOL's object-oriented features and control flow. Challenges include translating complex expressions (e.g., nested dispatches) and managing temporary variables.
+
+\subsection{TAC Structure}
+TAC, defined in \texttt{TACProgram.java}, organizes instructions by class and method. Instructions include \texttt{ASSIGN}, \texttt{BINARY}, \texttt{CALL}, \texttt{JUMP}, etc. Example:
+
+\begin{lstlisting}
+public class AssignTAC extends TACInstruction {
+    private String source;
+    public AssignTAC(String result, String source, int lineNumber) {
+        super(Opcode.ASSIGN, result, lineNumber);
+        this.source = source;
+    }
+}
+\end{lstlisting}
+
+\subsection{Implementation}
+\texttt{TACGenerator.java} traverses the AST, generating instructions. A key method is:
+
+\begin{lstlisting}
+public String visitMethodCallNode(MethodCallNode node) {
+    List<String> argResults = new ArrayList<>();
+    for (ExpressionNode arg : node.args) {
+        argResults.add(arg.accept(this));
+    }
+    String result = newTemp();
+    currentInstructions.add(new CallTAC(result, currentClass + "." + node.method, argResults, node.lineNumber));
+    return result;
+}
+\end{lstlisting}
+
+\subsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Temporary Variables}: Generated for intermediate results to ensure evaluation order.
+    \item \textbf{Control Flow}: Labels and jumps handle conditionals and loops.
+    \item \textbf{Object-Oriented Support}: Instructions for attribute access and dispatch.
+    \item \textbf{Modularity}: Separate classes for each instruction type.
+\end{itemize}    
+
+Challenges included handling \texttt{SELF\_TYPE} dispatches and ensuring correct control flow, addressed through careful instruction design and testing.
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Full Expression Support}: Translates all COOL expressions.
+    \item \textbf{Control Flow}: Accurate jumps and labels.
+    \item \textbf{Temporary Management}: Prevents register conflicts.
+    \item \textbf{COOL Compliance}: Supports object-oriented features.
+\end{itemize}
+
+\subsection{Example}
+For:
+\begin{lstlisting}
+let y : Int <    \item x + 1 in if y <= 50 then out_int(y) else abort() fi
+\end{lstlisting}
+TAC includes:
+\begin{lstlisting}
+t0 = load x
+t1 = t0 + 1
+y = t1
+t2 = y <= 50
+if t2 goto L0
+goto L1
+L0: t3 = call Main.out_int(y)
+...
+\end{lstlisting}
+
+\section{Visualization}
+\label{sec:visualization}
+
+\subsection{Purpose}
+Visualization generates PNG images of parse trees, ASTs, and CFGs to aid debugging and understanding (Sections 11, 13~\cite{cool_manual}). These graphics provide insights into the compiler's intermediate representations.
+
+\subsection{Background}
+Visualizations are implemented in the \texttt{visualization} package, using Graphviz to convert \texttt{.dot} files to PNGs. This phase enhances the compiler's educational value by making internal structures visible. Challenges include representing complex trees and graphs clearly.
+
+\subsection{Implementation}
+Key classes:
+\begin{itemize}[leftmargin=*]
+    \item \texttt{ParseTreeVisualizer.java}: Traverses parse trees to generate \texttt{.dot} files.
+    \item \texttt{ASTVisualizer.java}: Represents AST nodes and edges.
+    \item \texttt{CFGVisualizer.java}: Builds CFGs from TAC basic blocks.
+    \item \texttt{DotToImageConverter.java}: Executes Graphviz \texttt{dot} commands.
+\end{itemize}
+
+Example for parse tree:
+
+\begin{lstlisting}
+public class ParseTreeVisualizer {
+    public void visualize(ParseTree tree, String outputFile) {
+        dot.append("digraph ParseTree {\n");
+        visit(tree, 0);
+        dot.append("}\n");
+        try (PrintWriter writer = new PrintWriter(outputFile)) {
+            writer.println(dot.toString());
+        }
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Design Decisions}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Graphviz Integration}: Leverages \texttt{dot} for high-quality graphics.
+    \item \textbf{Hierarchical Representation}: Ensures clear node relationships.
+    \item \textbf{Error Handling}: Manages I/O and Graphviz errors.
+\end{itemize}
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Comprehensive Visuals}: Covers syntax, semantics, and control flow.
+    \item \textbf{PNG Output}: Cross-platform compatible.
+    \item \textbf{Debugging Aid}: Highlights structural issues.
+\end{itemize}
+
+\subsection{Example}
+For the example program, visualizations show parse tree nodes for \texttt{class}, AST nodes for \texttt{LetNode}, and CFG blocks with control flow edges.
+
+\section{Optimization}
+\label{sec:optimization}
+
+\subsection{Purpose}
+Optimization improves TAC efficiency, reducing runtime overhead while preserving semantics (Section 13~\cite{cool_manual}). This phase enhances performance for SPIM execution.
+
+\subsection{Background}
+Optimizations include constant folding and loop optimizations, implemented in \texttt{ProgramOptimizer.java}. The goal is to minimize instruction counts and improve control flow. Challenges include ensuring semantic equivalence and identifying optimization opportunities.
+
+\subsection{Implementation}
+\texttt{ProgramOptimizer.java} applies multiple passes:
+
+\begin{lstlisting}
+public class ProgramOptimizer {
+    public ProgramOptimizer() {
+        passes.add(new ConstantFolder());
+        passes.add(new LoopOptimizer());
+    }
+}
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{ConstantFolder}: Evaluates constant expressions (e.g., \texttt{2 + 3 = 5}).
+    \item \textbf{LoopOptimizer}: Applies loop-invariant code motion (LICM) and unrolling, using \texttt{LoopAnalyzer} to identify loops.
+\end{itemize}
+
+\subsubsection{Design Decisions}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Multiple Passes}: Allows iterative optimization.
+    \item \textbf{Semantic Checks}: Ensures transformations preserve behavior.
+    \item \textbf{Modularity}: Separate classes for each optimization.
+\end{itemize}
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Constant Folding}: Reduces constant computations.
+    \item \textbf{Loop Optimizations}: Improves loop performance.
+    \item \textbf{Semantic Safety}: Maintains program correctness.
+\end{itemize}
+
+\subsection{Example}
+For:
+\begin{lstlisting}
+let x : Int <    \item 2 + 3 in while i < 10 loop out_int(x) pool
+\end{lstlisting}
+optimized TAC is:
+\begin{lstlisting}
+x = 5
+L_preheader: t2 = x
+L0: t1 = i < 10
+...
+\end{lstlisting}
+
+\section{Code Generation}
+\label{sec:codegen}
+
+\subsection{Purpose}
+Code generation translates optimized TAC to MIPS assembly for SPIM execution (Section 2~\cite{cool_manual}). It maps TAC instructions to MIPS instructions, supporting COOL's object model.
+
+\subsection{Background}
+Implemented in \texttt{CodeGenerator.java}, this phase uses \texttt{ClassTable} for metadata and manages registers and stack. Challenges include implementing dispatch tables and ensuring type safety in assembly.
+
+\subsection{Implementation}
+\texttt{CodeGenerator.java} generates \texttt{AssemblyProgram.java} output:
+
+\begin{lstlisting}
+public class CodeGenerator {
+    public CodeGenerator(ClassTable classTable) {
+        this.program = new AssemblyProgram();
+        this.classTable = classTable;
+        this.freeRegisters = new LinkedHashSet<>(Arrays.asList("$r2", "$r3", ...));
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Design Decisions}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Register Allocation}: Uses a simple free-register pool.
+    \item \textbf{Dispatch Tables}: Implements method dispatch for inheritance.
+    \item \textbf{Stack Management}: Handles local variables and calls.
+\end{itemize}
+
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Full TAC Support}: Translates all instructions.
+    \item \textbf{Object-Oriented Features}: Supports inheritance and dispatch.
+    \item \textbf{SPIM Compatibility}: Produces executable code.
+\end{itemize}
+
+\section{Main Workflow}
+\label{sec:workflow}
+
+\subsection{Purpose}
+The main workflow orchestrates the compiler pipeline, processing \texttt{.cl} files to produce outputs.
+
+\subsection{Implementation}
+\texttt{Main.java} scans \texttt{samples} and applies each phase:
+
+\begin{lstlisting}
+public class Main {
+    public static void main(String[] args) {
+        Path samplesDir = Paths.get("samples");
+        Files.walk(samplesDir).filter(path -> path.toString().endsWith(".cl")).forEach(inputFile -> {
+            // Lexing, parsing, AST, semantic analysis, TAC, visualization, optimization, codegen
+        });
+    }
+}
+\end{lstlisting}
+
+\subsection{Features}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Batch Processing}: Handles multiple files.
+    \item \textbf{Error Handling}: Logs errors to \texttt{.errors} files.
+    \item \textbf{Visualization Support}: Generates diagnostic graphics.
+\end{itemize}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This COOL compiler fully implements the language specification~\cite{cool_manual}, producing type-safe MIPS assembly and visualizations. Future work could explore advanced optimizations and cross-platform code generation.
+
+\begin{thebibliography}{1}
+\bibitem{cool_manual}
+The Cool Reference Manual, CS164, University of California, Berkeley, 2025.
+\end{thebibliography}
+
+\end{document}
