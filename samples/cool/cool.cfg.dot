@@ -1,0 +1,10 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_0:\lt0 = call new Object()\lt1 = call type_name()\lt2 = 4\lt3 = 1\lt4 = call substr(t2, t3)\lt5 = call Main.out_string(t4)\lt6 = isvoid self\lt7 = call type_name()\lt8 = 1\lt9 = 3\lt10 = call substr(t8, t9)\lt11 = call out_string(t10)\lt12 = \"\n\"\lt13 = call Main.out_string(t12)\lreturn t13\l"];
+    node0 -> node0;
+    }
+}
+

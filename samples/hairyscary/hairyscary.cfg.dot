@@ -1,0 +1,28 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Bazz_doh" {
+        label="Bazz.doh";
+        color=blue;
+    node0 [label="L_auto_0:\lt7 = load h\li = t7\lt8 = load h\lt9 = 1\lt10 = t8 + t9\lstore t10 -> h\lreturn i\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Bazz_printh" {
+        label="Bazz.printh";
+        color=blue;
+    node0 [label="L_auto_1:\lt4 = load h\lt5 = call Bazz.out_int(t4)\lt6 = 0\lreturn t6\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Foo_doh" {
+        label="Foo.doh";
+        color=blue;
+    node0 [label="L_auto_2:\lt0 = load h\li = t0\lt1 = load h\lt2 = 2\lt3 = t1 + t2\lstore t3 -> h\lreturn i\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_3:\lt11 = \"do nothing\"\lreturn t11\l"];
+    node0 -> node0;
+    }
+}
+

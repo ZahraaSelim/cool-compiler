@@ -1,0 +1,10 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_0:\lt0 = \"Hello, World.\n\"\lt1 = call Main.out_string(t0)\lreturn t1\l"];
+    node0 -> node0;
+    }
+}
+

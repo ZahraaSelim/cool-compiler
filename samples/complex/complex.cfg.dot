@@ -1,0 +1,62 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_0:\lt0 = call new Complex()\lt1 = 1\lt2 = 1\lt3 = call init(t1, t2)\lc = t3\lt4 = call reflect_X()\lt5 = call reflect_Y()\lt6 = call reflect_0()\lt7 = t5 = t6\lif t7 goto L0\l"];
+    node1 [label="L_auto_1:\lgoto L1\l"];
+    node2 [label="L0:\lt8 = \"=)\n\"\lt9 = call Main.out_string(t8)\lt10 = t9\lgoto L2\l"];
+    node3 [label="L1:\lt11 = \"=(\n\"\lt12 = call Main.out_string(t11)\lt10 = t12\l"];
+    node4 [label="L2:\lreturn t10\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_Complex_init" {
+        label="Complex.init";
+        color=blue;
+    node0 [label="L_auto_2:\lparam a\lparam b\lt13 = load x\lt14 = t13 = a\lt15 = load y\lt16 = t15 = b\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_print" {
+        label="Complex.print";
+        color=blue;
+    node0 [label="L_auto_3:\lt17 = load y\lt18 = 0\lt19 = t17 = t18\lif t19 goto L3\l"];
+    node1 [label="L_auto_4:\lgoto L4\l"];
+    node2 [label="L3:\lt20 = load x\lt21 = call Complex.out_int(t20)\lt22 = t21\lgoto L5\l"];
+    node3 [label="L4:\lt23 = load x\lt24 = call Complex.out_int(t23)\lt25 = \"+\"\lt26 = call out_string(t25)\lt27 = load y\lt28 = call out_int(t27)\lt29 = \"I\"\lt30 = call out_string(t29)\lt22 = t30\l"];
+    node4 [label="L5:\lreturn t22\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_Complex_reflect_Y" {
+        label="Complex.reflect_Y";
+        color=blue;
+    node0 [label="L_auto_5:\lt43 = load x\lt44 = load x\lt45 = ~ t44\lt46 = t43 = t45\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_reflect_X" {
+        label="Complex.reflect_X";
+        color=blue;
+    node0 [label="L_auto_6:\lt39 = load y\lt40 = load y\lt41 = ~ t40\lt42 = t39 = t41\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Complex_reflect_0" {
+        label="Complex.reflect_0";
+        color=blue;
+    node0 [label="L_auto_7:\lt31 = load x\lt32 = load x\lt33 = ~ t32\lt34 = t31 = t33\lt35 = load y\lt36 = load y\lt37 = ~ t36\lt38 = t35 = t37\lreturn self\l"];
+    node0 -> node0;
+    }
+}
+

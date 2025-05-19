@@ -1,0 +1,13 @@
+digraph AST {
+    node [shape=box];
+    0 [label="Program\nLine: 1"];
+    1 [label="Class: Main\nInherits: IO\nLine: 1"];
+    2 [label="Method: main\nReturn: SELF_TYPE\nLine: 2"];
+    3 [label="MethodCall: out_string\nLine: 3"];
+    4 [label="String: \"Hello, World.\n\"\nLine: 3"];
+    3 -> 4;
+    2 -> 3;
+    1 -> 2;
+    0 -> 1;
+}
+

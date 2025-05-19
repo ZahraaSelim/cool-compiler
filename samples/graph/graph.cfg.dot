@@ -1,0 +1,499 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_EList_head" {
+        label="EList.head";
+        color=blue;
+    node0 [label="L_auto_0:\lt30 = call EList.abort()\lt31 = load car\lreturn t31\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_EList_print" {
+        label="EList.print";
+        color=blue;
+    node0 [label="L_auto_1:\lt41 = \"\n\"\lt42 = call EList.out_string(t41)\lreturn t42\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_EList_tail" {
+        label="EList.tail";
+        color=blue;
+    node0 [label="L_auto_2:\lt32 = call EList.abort()\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_EList_isNil" {
+        label="EList.isNil";
+        color=blue;
+    node0 [label="L_auto_3:\lt29 = true\lreturn t29\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_EList_append" {
+        label="EList.append";
+        color=blue;
+    node0 [label="L_auto_4:\lparam l\lt35 = call isNil()\lif t35 goto L0\l"];
+    node1 [label="L_auto_5:\lgoto L1\l"];
+    node2 [label="L0:\lt36 = l\lgoto L2\l"];
+    node3 [label="L1:\lt37 = call EList.tail()\lt38 = call append(l)\lt39 = call EList.head()\lt40 = call cons(t39)\lt36 = t40\l"];
+    node4 [label="L2:\lreturn t36\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node2 -> node2;
+    node3 -> node3;
+    }
+    subgraph "cluster_EList_cons" {
+        label="EList.cons";
+        color=blue;
+    node0 [label="L_auto_6:\lparam e\lt33 = call new ECons()\lt34 = call init(e, self)\lreturn t34\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Graph_add_vertice" {
+        label="Graph.add_vertice";
+        color=blue;
+    node0 [label="L_auto_7:\lparam v\lt0 = call outgoing()\lt1 = load edges\lt2 = call append(t1)\lstore t2 -> edges\lt3 = load vertices\lt4 = call cons(v)\lstore t4 -> vertices\lreturn t4\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Graph_print_V" {
+        label="Graph.print_V";
+        color=blue;
+    node0 [label="L_auto_8:\lt7 = load vertices\lt8 = call print()\lreturn t8\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Graph_print_E" {
+        label="Graph.print_E";
+        color=blue;
+    node0 [label="L_auto_9:\lt5 = load edges\lt6 = call print()\lreturn t6\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VList_head" {
+        label="VList.head";
+        color=blue;
+    node0 [label="L_auto_10:\lt51 = call VList.abort()\lt52 = load car\lreturn t52\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VList_print" {
+        label="VList.print";
+        color=blue;
+    node0 [label="L_auto_11:\lt56 = \"\n\"\lt57 = call VList.out_string(t56)\lreturn t57\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VList_tail" {
+        label="VList.tail";
+        color=blue;
+    node0 [label="L_auto_12:\lt53 = call VList.abort()\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VList_isNil" {
+        label="VList.isNil";
+        color=blue;
+    node0 [label="L_auto_13:\lt50 = true\lreturn t50\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VList_cons" {
+        label="VList.cons";
+        color=blue;
+    node0 [label="L_auto_14:\lparam v\lt54 = call new VCons()\lt55 = call init(v, self)\lreturn t55\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Vertice_outgoing" {
+        label="Vertice.outgoing";
+        color=blue;
+    node0 [label="L_auto_15:\lt9 = load out\lreturn t9\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Vertice_number" {
+        label="Vertice.number";
+        color=blue;
+    node0 [label="L_auto_16:\lt10 = load num\lreturn t10\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Vertice_init" {
+        label="Vertice.init";
+        color=blue;
+    node0 [label="L_auto_17:\lparam n\lstore n -> num\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Vertice_print" {
+        label="Vertice.print";
+        color=blue;
+    node0 [label="L_auto_18:\lt13 = load num\lt14 = call Vertice.out_int(t13)\lt15 = load out\lt16 = call print()\lreturn t16\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Vertice_add_out" {
+        label="Vertice.add_out";
+        color=blue;
+    node0 [label="L_auto_19:\lparam s\lt11 = load out\lt12 = call cons(s)\lstore t12 -> out\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Parse_parse_line" {
+        label="Parse.parse_line";
+        color=blue;
+    node0 [label="L_auto_20:\lparam s\lt78 = call new Vertice()\lt79 = call Parse.a2i(s)\lt80 = call init(t79)\lv = t80\l"];
+    node1 [label="L6:\lt81 = load rest\lt82 = call length()\lt83 = 0\lt84 = t82 = t83\lt85 = not t84\lif t85 goto L7\l"];
+    node2 [label="L_auto_21:\lgoto L8\l"];
+    node3 [label="L7:\lt86 = load rest\lt87 = call Parse.a2i(t86)\lsucc = t87\lt88 = load rest\lt89 = call Parse.a2i(t88)\lweight = t89\lt90 = call new Edge()\lt91 = call number()\lt92 = call init(t91, succ, weight)\lt93 = call add_out(t92)\lgoto L6\l"];
+    node4 [label="L8:\lreturn v\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node1 -> node1;
+    node1 -> node2;
+    node1 -> node3;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node0;
+    }
+    subgraph "cluster_Parse_a2i" {
+        label="Parse.a2i";
+        color=blue;
+    node0 [label="L_auto_22:\lparam s\lt136 = call length()\lt137 = 0\lt138 = t136 = t137\lif t138 goto L39\l"];
+    node1 [label="L_auto_23:\lgoto L40\l"];
+    node2 [label="L39:\lt139 = 0\lt140 = t139\lgoto L41\l"];
+    node3 [label="L40:\lt141 = 0\lt142 = 1\lt143 = call substr(t141, t142)\lt144 = \"-\"\lt145 = t143 = t144\lif t145 goto L42\l"];
+    node4 [label="L_auto_24:\lgoto L43\l"];
+    node5 [label="L42:\lt146 = 1\lt147 = call length()\lt148 = 1\lt149 = t147 - t148\lt150 = call substr(t146, t149)\lt151 = call Parse.a2i_aux(t150)\lt152 = ~ t151\lt153 = t152\lgoto L44\l"];
+    node6 [label="L43:\lt154 = 0\lt155 = 1\lt156 = call substr(t154, t155)\lt157 = \" \"\lt158 = t156 = t157\lif t158 goto L45\l"];
+    node7 [label="L_auto_25:\lgoto L46\l"];
+    node8 [label="L45:\lt159 = 1\lt160 = call length()\lt161 = 1\lt162 = t160 - t161\lt163 = call substr(t159, t162)\lt164 = call Parse.a2i(t163)\lt165 = t164\lgoto L47\l"];
+    node9 [label="L46:\lt166 = call Parse.a2i_aux(s)\lt165 = t166\l"];
+    node10 [label="L47:\lt153 = t165\l"];
+    node11 [label="L44:\lt140 = t153\l"];
+    node12 [label="L41:\lreturn t140\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node10;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node5;
+    node3 -> node4;
+    node4 -> node4;
+    node4 -> node5;
+    node5 -> node5;
+    node5 -> node9;
+    node5 -> node6;
+    node6 -> node6;
+    node6 -> node8;
+    node6 -> node7;
+    node7 -> node7;
+    node7 -> node8;
+    node8 -> node8;
+    node8 -> node9;
+    node9 -> node9;
+    node9 -> node10;
+    node10 -> node10;
+    }
+    subgraph "cluster_Parse_c2i" {
+        label="Parse.c2i";
+        color=blue;
+    node0 [label="L_auto_26:\lparam char\lt94 = \"0\"\lt95 = char = t94\lif t95 goto L9\l"];
+    node1 [label="L_auto_27:\lgoto L10\l"];
+    node2 [label="L9:\lt96 = 0\lt97 = t96\lgoto L11\l"];
+    node3 [label="L10:\lt98 = \"1\"\lt99 = char = t98\lif t99 goto L12\l"];
+    node4 [label="L_auto_28:\lgoto L13\l"];
+    node5 [label="L12:\lt100 = 1\lt101 = t100\lgoto L14\l"];
+    node6 [label="L13:\lt102 = \"2\"\lt103 = char = t102\lif t103 goto L15\l"];
+    node7 [label="L_auto_29:\lgoto L16\l"];
+    node8 [label="L15:\lt104 = 2\lt105 = t104\lgoto L17\l"];
+    node9 [label="L16:\lt106 = \"3\"\lt107 = char = t106\lif t107 goto L18\l"];
+    node10 [label="L_auto_30:\lgoto L19\l"];
+    node11 [label="L18:\lt108 = 3\lt109 = t108\lgoto L20\l"];
+    node12 [label="L19:\lt110 = \"4\"\lt111 = char = t110\lif t111 goto L21\l"];
+    node13 [label="L_auto_31:\lgoto L22\l"];
+    node14 [label="L21:\lt112 = 4\lt113 = t112\lgoto L23\l"];
+    node15 [label="L22:\lt114 = \"5\"\lt115 = char = t114\lif t115 goto L24\l"];
+    node16 [label="L_auto_32:\lgoto L25\l"];
+    node17 [label="L24:\lt116 = 5\lt117 = t116\lgoto L26\l"];
+    node18 [label="L25:\lt118 = \"6\"\lt119 = char = t118\lif t119 goto L27\l"];
+    node19 [label="L_auto_33:\lgoto L28\l"];
+    node20 [label="L27:\lt120 = 6\lt121 = t120\lgoto L29\l"];
+    node21 [label="L28:\lt122 = \"7\"\lt123 = char = t122\lif t123 goto L30\l"];
+    node22 [label="L_auto_34:\lgoto L31\l"];
+    node23 [label="L30:\lt124 = 7\lt125 = t124\lgoto L32\l"];
+    node24 [label="L31:\lt126 = \"8\"\lt127 = char = t126\lif t127 goto L33\l"];
+    node25 [label="L_auto_35:\lgoto L34\l"];
+    node26 [label="L33:\lt128 = 8\lt129 = t128\lgoto L35\l"];
+    node27 [label="L34:\lt130 = \"9\"\lt131 = char = t130\lif t131 goto L36\l"];
+    node28 [label="L_auto_36:\lgoto L37\l"];
+    node29 [label="L36:\lt132 = 9\lt133 = t132\lgoto L38\l"];
+    node30 [label="L37:\lt134 = call Parse.abort()\lt135 = 0\lt133 = t135\l"];
+    node31 [label="L38:\lt129 = t133\l"];
+    node32 [label="L35:\lt125 = t129\l"];
+    node33 [label="L32:\lt121 = t125\l"];
+    node34 [label="L29:\lt117 = t121\l"];
+    node35 [label="L26:\lt113 = t117\l"];
+    node36 [label="L23:\lt109 = t113\l"];
+    node37 [label="L20:\lt105 = t109\l"];
+    node38 [label="L17:\lt101 = t105\l"];
+    node39 [label="L14:\lt97 = t101\l"];
+    node40 [label="L11:\lreturn t97\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node34;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node5;
+    node3 -> node4;
+    node4 -> node4;
+    node4 -> node5;
+    node5 -> node33;
+    node5 -> node5;
+    node5 -> node6;
+    node6 -> node6;
+    node6 -> node8;
+    node6 -> node7;
+    node7 -> node7;
+    node7 -> node32;
+    node8 -> node8;
+    node8 -> node9;
+    node9 -> node10;
+    node9 -> node9;
+    node10 -> node31;
+    node10 -> node11;
+    node11 -> node11;
+    node11 -> node12;
+    node11 -> node13;
+    node12 -> node12;
+    node12 -> node30;
+    node13 -> node13;
+    node13 -> node14;
+    node14 -> node14;
+    node14 -> node15;
+    node15 -> node15;
+    node15 -> node30;
+    node15 -> node16;
+    node16 -> node16;
+    node16 -> node17;
+    node17 -> node17;
+    node17 -> node18;
+    node18 -> node18;
+    node18 -> node29;
+    node18 -> node19;
+    node19 -> node19;
+    node19 -> node20;
+    node20 -> node21;
+    node20 -> node20;
+    node21 -> node29;
+    node21 -> node21;
+    node21 -> node22;
+    node22 -> node22;
+    node22 -> node23;
+    node22 -> node24;
+    node23 -> node23;
+    node23 -> node28;
+    node24 -> node24;
+    node24 -> node25;
+    node25 -> node26;
+    node26 -> node26;
+    node26 -> node27;
+    node27 -> node27;
+    node27 -> node28;
+    node28 -> node28;
+    node28 -> node29;
+    node29 -> node29;
+    node29 -> node30;
+    node30 -> node30;
+    node30 -> node31;
+    node31 -> node31;
+    node31 -> node32;
+    node32 -> node32;
+    node32 -> node33;
+    node33 -> node33;
+    node33 -> node34;
+    node34 -> node34;
+    node34 -> node35;
+    }
+    subgraph "cluster_Parse_read_input" {
+        label="Parse.read_input";
+        color=blue;
+    node0 [label="L_auto_37:\lt65 = call new Graph()\lg = t65\lt66 = call Parse.in_string()\lline = t66\l"];
+    node1 [label="L3:\lt67 = load boolop\lt68 = \"\n\"\lt69 = line = t68\lt70 = not t69\lt71 = \"\"\lt72 = line = t71\lt73 = not t72\lt74 = call and(t70, t73)\lif t74 goto L4\l"];
+    node2 [label="L_auto_38:\lgoto L5\l"];
+    node3 [label="L4:\lt75 = call Parse.parse_line(line)\lt76 = call add_vertice(t75)\lt77 = call Parse.in_string()\lline = t77\lgoto L3\l"];
+    node4 [label="L5:\lreturn g\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node1 -> node1;
+    node1 -> node2;
+    node1 -> node3;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node0;
+    }
+    subgraph "cluster_Parse_a2i_aux" {
+        label="Parse.a2i_aux";
+        color=blue;
+    node0 [label="L_auto_39:\lparam s\lt167 = 0\lint = t167\lt168 = call length()\lj = t168\lt169 = 0\li = t169\l"];
+    node1 [label="L48:\lt170 = i < j\lif t170 goto L49\l"];
+    node2 [label="L_auto_40:\lgoto L50\l"];
+    node3 [label="L49:\lt171 = 1\lt172 = call substr(i, t171)\lc = t172\lt173 = \" \"\lt174 = c = t173\lif t174 goto L51\l"];
+    node4 [label="L_auto_41:\lgoto L52\l"];
+    node5 [label="L51:\lt175 = 1\lt176 = i + t175\lt177 = call length()\lt178 = t177 - i\lt179 = 1\lt180 = t178 - t179\lt181 = call substr(t176, t180)\lstore t181 -> rest\li = j\lt182 = j\lgoto L53\l"];
+    node6 [label="L52:\lt183 = \",\"\lt184 = c = t183\lif t184 goto L54\l"];
+    node7 [label="L_auto_42:\lgoto L55\l"];
+    node8 [label="L54:\lt185 = 1\lt186 = i + t185\lt187 = call length()\lt188 = t187 - i\lt189 = 1\lt190 = t188 - t189\lt191 = call substr(t186, t190)\lstore t191 -> rest\li = j\lt192 = j\lgoto L56\l"];
+    node9 [label="L55:\lt193 = 10\lt194 = int * t193\lt195 = 1\lt196 = call substr(i, t195)\lt197 = call Parse.c2i(t196)\lt198 = t194 + t197\lint = t198\lt199 = 1\lt200 = i + t199\li = t200\lt201 = i = j\lif t201 goto L57\l"];
+    node10 [label="L_auto_43:\lgoto L58\l"];
+    node11 [label="L57:\lt202 = \"\"\lstore t202 -> rest\lt203 = t202\lgoto L59\l"];
+    node12 [label="L58:\lt204 = \"\"\lt203 = t204\l"];
+    node13 [label="L59:\lt192 = t203\l"];
+    node14 [label="L56:\lt182 = t192\l"];
+    node15 [label="L53:\lgoto L48\l"];
+    node16 [label="L50:\lreturn int\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node1 -> node1;
+    node1 -> node2;
+    node1 -> node13;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node5;
+    node3 -> node4;
+    node4 -> node4;
+    node4 -> node5;
+    node5 -> node5;
+    node5 -> node12;
+    node5 -> node6;
+    node6 -> node6;
+    node6 -> node8;
+    node6 -> node7;
+    node7 -> node7;
+    node7 -> node8;
+    node8 -> node8;
+    node8 -> node12;
+    node8 -> node9;
+    node9 -> node9;
+    node9 -> node11;
+    node9 -> node10;
+    node10 -> node10;
+    node10 -> node11;
+    node11 -> node11;
+    node11 -> node12;
+    node12 -> node12;
+    node12 -> node13;
+    node13 -> node0;
+    node13 -> node14;
+    }
+    subgraph "cluster_ECons_head" {
+        label="ECons.head";
+        color=blue;
+    node0 [label="L_auto_44:\lt44 = load car\lreturn t44\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_ECons_init" {
+        label="ECons.init";
+        color=blue;
+    node0 [label="L_auto_45:\lparam e\lparam rest\lstore e -> car\lstore rest -> cdr\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_ECons_print" {
+        label="ECons.print";
+        color=blue;
+    node0 [label="L_auto_46:\lt46 = load car\lt47 = call print()\lt48 = load cdr\lt49 = call print()\lreturn t49\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_ECons_tail" {
+        label="ECons.tail";
+        color=blue;
+    node0 [label="L_auto_47:\lt45 = load cdr\lreturn t45\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_ECons_isNil" {
+        label="ECons.isNil";
+        color=blue;
+    node0 [label="L_auto_48:\lt43 = false\lreturn t43\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BoolOp_or" {
+        label="BoolOp.or";
+        color=blue;
+    node0 [label="L_auto_49:\lparam b1\lparam b2\lif b1 goto L63\l"];
+    node1 [label="L_auto_50:\lgoto L64\l"];
+    node2 [label="L63:\lt211 = true\lt212 = t211\lgoto L65\l"];
+    node3 [label="L64:\lt212 = b2\l"];
+    node4 [label="L65:\lreturn t212\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_BoolOp_and" {
+        label="BoolOp.and";
+        color=blue;
+    node0 [label="L_auto_51:\lparam b1\lparam b2\lif b1 goto L60\l"];
+    node1 [label="L_auto_52:\lgoto L61\l"];
+    node2 [label="L60:\lt209 = b2\lgoto L62\l"];
+    node3 [label="L61:\lt210 = false\lt209 = t210\l"];
+    node4 [label="L62:\lreturn t209\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node2 -> node2;
+    node3 -> node3;
+    }
+    subgraph "cluster_VCons_head" {
+        label="VCons.head";
+        color=blue;
+    node0 [label="L_auto_53:\lt59 = load car\lreturn t59\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VCons_init" {
+        label="VCons.init";
+        color=blue;
+    node0 [label="L_auto_54:\lparam v\lparam rest\lstore v -> car\lstore rest -> cdr\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VCons_print" {
+        label="VCons.print";
+        color=blue;
+    node0 [label="L_auto_55:\lt61 = load car\lt62 = call print()\lt63 = load cdr\lt64 = call print()\lreturn t64\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VCons_tail" {
+        label="VCons.tail";
+        color=blue;
+    node0 [label="L_auto_56:\lt60 = load cdr\lreturn t60\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_VCons_isNil" {
+        label="VCons.isNil";
+        color=blue;
+    node0 [label="L_auto_57:\lt58 = false\lreturn t58\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_58:\lt205 = load g\lt206 = call print_V()\lt207 = load g\lt208 = call print_E()\lreturn t208\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Edge_init" {
+        label="Edge.init";
+        color=blue;
+    node0 [label="L_auto_59:\lparam f\lparam t\lparam w\lstore f -> from\lstore t -> to\lstore w -> weight\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Edge_print" {
+        label="Edge.print";
+        color=blue;
+    node0 [label="L_auto_60:\lt17 = \" (\"\lt18 = call Edge.out_string(t17)\lt19 = load from\lt20 = call Edge.out_int(t19)\lt21 = \",\"\lt22 = call Edge.out_string(t21)\lt23 = load to\lt24 = call Edge.out_int(t23)\lt25 = \")\"\lt26 = call Edge.out_string(t25)\lt27 = load weight\lt28 = call Edge.out_int(t27)\lreturn t28\l"];
+    node0 -> node0;
+    }
+}
+

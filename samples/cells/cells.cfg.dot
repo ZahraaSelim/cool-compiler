@@ -1,0 +1,151 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_CellularAutomaton_init" {
+        label="CellularAutomaton.init";
+        color=blue;
+    node0 [label="L_auto_0:\lparam map\lstore map -> population_map\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_CellularAutomaton_evolve" {
+        label="CellularAutomaton.evolve";
+        color=blue;
+    node0 [label="L_auto_1:\lt54 = call CellularAutomaton.num_cells()\lnum = t54\l"];
+    node1 [label="L18:\lt55 = position < num\lif t55 goto L19\l"];
+    node2 [label="L_auto_2:\lgoto L20\l"];
+    node3 [label="L19:\lt56 = call CellularAutomaton.cell_at_next_evolution(position)\lt57 = call concat(t56)\ltemp = t57\lt58 = 1\lt59 = position + t58\lposition = t59\lgoto L18\l"];
+    node4 [label="L20:\lstore temp -> population_map\lreturn self\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node1 -> node1;
+    node1 -> node2;
+    node1 -> node3;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node0;
+    node3 -> node4;
+    }
+    subgraph "cluster_CellularAutomaton_print" {
+        label="CellularAutomaton.print";
+        color=blue;
+    node0 [label="L_auto_3:\lt0 = load population_map\lt1 = \"\n\"\lt2 = call concat(t1)\lt3 = call CellularAutomaton.out_string(t2)\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_CellularAutomaton_cell_left_neighbor" {
+        label="CellularAutomaton.cell_left_neighbor";
+        color=blue;
+    node0 [label="L_auto_4:\lparam position\lt9 = 0\lt10 = position = t9\lif t10 goto L0\l"];
+    node1 [label="L_auto_5:\lgoto L1\l"];
+    node2 [label="L0:\lt11 = call CellularAutomaton.num_cells()\lt12 = 1\lt13 = t11 - t12\lt14 = call CellularAutomaton.cell(t13)\lt15 = t14\lgoto L2\l"];
+    node3 [label="L1:\lt16 = 1\lt17 = position - t16\lt18 = call CellularAutomaton.cell(t17)\lt15 = t18\l"];
+    node4 [label="L2:\lreturn t15\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_CellularAutomaton_cell_right_neighbor" {
+        label="CellularAutomaton.cell_right_neighbor";
+        color=blue;
+    node0 [label="L_auto_6:\lparam position\lt19 = call CellularAutomaton.num_cells()\lt20 = 1\lt21 = t19 - t20\lt22 = position = t21\lif t22 goto L3\l"];
+    node1 [label="L_auto_7:\lgoto L4\l"];
+    node2 [label="L3:\lt23 = 0\lt24 = call CellularAutomaton.cell(t23)\lt25 = t24\lgoto L5\l"];
+    node3 [label="L4:\lt26 = 1\lt27 = position + t26\lt28 = call CellularAutomaton.cell(t27)\lt25 = t28\l"];
+    node4 [label="L5:\lreturn t25\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    }
+    subgraph "cluster_CellularAutomaton_cell" {
+        label="CellularAutomaton.cell";
+        color=blue;
+    node0 [label="L_auto_8:\lparam position\lt6 = load population_map\lt7 = 1\lt8 = call substr(position, t7)\lreturn t8\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_CellularAutomaton_cell_at_next_evolution" {
+        label="CellularAutomaton.cell_at_next_evolution";
+        color=blue;
+    node0 [label="L_auto_9:\lparam position\lt29 = call CellularAutomaton.cell(position)\lt30 = \"X\"\lt31 = t29 = t30\lif t31 goto L6\l"];
+    node1 [label="L_auto_10:\lgoto L7\l"];
+    node2 [label="L6:\lt32 = 1\lt33 = t32\lgoto L8\l"];
+    node3 [label="L7:\lt34 = 0\lt33 = t34\l"];
+    node4 [label="L8:\lt35 = call CellularAutomaton.cell_left_neighbor(position)\lt36 = \"X\"\lt37 = t35 = t36\lif t37 goto L9\l"];
+    node5 [label="L_auto_11:\lgoto L10\l"];
+    node6 [label="L9:\lt38 = 1\lt39 = t38\lgoto L11\l"];
+    node7 [label="L10:\lt40 = 0\lt39 = t40\l"];
+    node8 [label="L11:\lt41 = t33 + t39\lt42 = call CellularAutomaton.cell_right_neighbor(position)\lt43 = \"X\"\lt44 = t42 = t43\lif t44 goto L12\l"];
+    node9 [label="L_auto_12:\lgoto L13\l"];
+    node10 [label="L12:\lt45 = 1\lt46 = t45\lgoto L14\l"];
+    node11 [label="L13:\lt47 = 0\lt46 = t47\l"];
+    node12 [label="L14:\lt48 = t41 + t46\lt49 = 1\lt50 = t48 = t49\lif t50 goto L15\l"];
+    node13 [label="L_auto_13:\lgoto L16\l"];
+    node14 [label="L15:\lt51 = \"X\"\lt52 = t51\lgoto L17\l"];
+    node15 [label="L16:\lt53 = \".\"\lt52 = t53\l"];
+    node16 [label="L17:\lreturn t52\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node4;
+    node4 -> node4;
+    node4 -> node6;
+    node4 -> node5;
+    node5 -> node5;
+    node5 -> node6;
+    node6 -> node7;
+    node6 -> node6;
+    node7 -> node7;
+    node7 -> node8;
+    node8 -> node8;
+    node8 -> node10;
+    node8 -> node9;
+    node9 -> node9;
+    node9 -> node10;
+    node10 -> node10;
+    node10 -> node11;
+    node11 -> node11;
+    node11 -> node12;
+    node12 -> node12;
+    node12 -> node13;
+    node13 -> node14;
+    node14 -> node14;
+    }
+    subgraph "cluster_CellularAutomaton_num_cells" {
+        label="CellularAutomaton.num_cells";
+        color=blue;
+    node0 [label="L_auto_14:\lt4 = load population_map\lt5 = call length()\lreturn t5\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_15:\lt60 = call new CellularAutomaton()\lt61 = \"         X         \"\lt62 = call init(t61)\lstore t62 -> cells\lt63 = load cells\lt64 = call print()\lt65 = 20\lcountdown = t65\l"];
+    node1 [label="L21:\lt66 = 0\lt67 = t66 < countdown\lif t67 goto L22\l"];
+    node2 [label="L_auto_16:\lgoto L23\l"];
+    node3 [label="L22:\lt68 = load cells\lt69 = call evolve()\lt70 = load cells\lt71 = call print()\lt72 = 1\lt73 = countdown - t72\lcountdown = t73\lgoto L21\l"];
+    node4 [label="L23:\lreturn self\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node1 -> node1;
+    node1 -> node2;
+    node1 -> node3;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node0;
+    }
+}
+

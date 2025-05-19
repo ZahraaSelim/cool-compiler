@@ -1,0 +1,119 @@
+digraph CFG {
+    node [shape=box, style=filled, fillcolor=lightgrey];
+    subgraph "cluster_Nil_print_list" {
+        label="Nil.print_list";
+        color=blue;
+    node0 [label="L_auto_0:\lt42 = true\lreturn t42\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Nil_isNil" {
+        label="Nil.isNil";
+        color=blue;
+    node0 [label="L_auto_1:\lt41 = true\lreturn t41\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_cdr" {
+        label="Cons.cdr";
+        color=blue;
+    node0 [label="L_auto_2:\lt31 = load xcdr\lreturn t31\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_init" {
+        label="Cons.init";
+        color=blue;
+    node0 [label="L_auto_3:\lparam hd\lparam tl\lstore hd -> xcar\lstore tl -> xcdr\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_print_list" {
+        label="Cons.print_list";
+        color=blue;
+    node0 [label="L_auto_4:\lt32 = load xcar\lt33 = call print()\lif t33.type == Book goto L1\l"];
+    node1 [label="L_auto_5:\lif t33.type == Article goto L2\l"];
+    node2 [label="L1:\lt35 = \"- dynamic type was Book -\n\"\lt36 = call Cons.out_string(t35)\lt34 = t36\lgoto L0\l"];
+    node3 [label="L2:\lt37 = \"- dynamic type was Article -\n\"\lt38 = call Cons.out_string(t37)\lt34 = t38\lgoto L0\l"];
+    node4 [label="L0:\lt39 = load xcdr\lt40 = call print_list()\lreturn t40\l"];
+    node0 -> node0;
+    node0 -> node1;
+    node0 -> node2;
+    node1 -> node1;
+    node1 -> node2;
+    node2 -> node2;
+    node2 -> node3;
+    node3 -> node3;
+    node3 -> node4;
+    node4 -> node4;
+    }
+    subgraph "cluster_Cons_car" {
+        label="Cons.car";
+        color=blue;
+    node0 [label="L_auto_6:\lt30 = load xcar\lreturn t30\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Cons_isNil" {
+        label="Cons.isNil";
+        color=blue;
+    node0 [label="L_auto_7:\lt29 = false\lreturn t29\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BookList_cdr" {
+        label="BookList.cdr";
+        color=blue;
+    node0 [label="L_auto_8:\lt26 = call BookList.abort()\lt27 = call new BookList()\lreturn t27\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BookList_print_list" {
+        label="BookList.print_list";
+        color=blue;
+    node0 [label="L_auto_9:\lt28 = call BookList.abort()\lreturn t28\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BookList_car" {
+        label="BookList.car";
+        color=blue;
+    node0 [label="L_auto_10:\lt24 = call BookList.abort()\lt25 = call new Book()\lreturn t25\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BookList_isNil" {
+        label="BookList.isNil";
+        color=blue;
+    node0 [label="L_auto_11:\lt20 = call BookList.abort()\lt21 = true\lreturn t21\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_BookList_cons" {
+        label="BookList.cons";
+        color=blue;
+    node0 [label="L_auto_12:\lparam hd\lt22 = call new Cons()\lnew_cell = t22\lt23 = call init(hd, self)\lreturn t23\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Book_initBook" {
+        label="Book.initBook";
+        color=blue;
+    node0 [label="L_auto_13:\lparam title_p\lparam author_p\lstore title_p -> title\lstore author_p -> author\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Book_print" {
+        label="Book.print";
+        color=blue;
+    node0 [label="L_auto_14:\lt0 = \"title:      \"\lt1 = call Book.out_string(t0)\lt2 = load title\lt3 = call out_string(t2)\lt4 = \"\n\"\lt5 = call out_string(t4)\lt6 = \"author:     \"\lt7 = call Book.out_string(t6)\lt8 = load author\lt9 = call out_string(t8)\lt10 = \"\n\"\lt11 = call out_string(t10)\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Article_initArticle" {
+        label="Article.initArticle";
+        color=blue;
+    node0 [label="L_auto_15:\lparam title_p\lparam author_p\lparam per_title_p\lt12 = call Article.initBook(title_p, author_p)\lstore per_title_p -> per_title\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Article_print" {
+        label="Article.print";
+        color=blue;
+    node0 [label="L_auto_16:\lt13 = call Book.print()\lt14 = \"periodical:  \"\lt15 = call Article.out_string(t14)\lt16 = load per_title\lt17 = call out_string(t16)\lt18 = \"\n\"\lt19 = call out_string(t18)\lreturn self\l"];
+    node0 -> node0;
+    }
+    subgraph "cluster_Main_main" {
+        label="Main.main";
+        color=blue;
+    node0 [label="L_auto_17:\lt43 = call new Book()\lt44 = \"Compilers, Principles, Techniques, and Tools\"\lt45 = \"Aho, Sethi, and Ullman\"\lt46 = call initBook(t44, t45)\la_book = t46\lt47 = call new Article()\lt48 = \"The Top 100 CD_ROMs\"\lt49 = \"Ulanoff\"\lt50 = \"PC Magazine\"\lt51 = call initArticle(t48, t49, t50)\lan_article = t51\lt52 = call new Nil()\lt53 = call cons(a_book)\lt54 = call cons(an_article)\lstore t54 -> books\lt55 = load books\lt56 = call print_list()\lreturn t56\l"];
+    node0 -> node0;
+    }
+}
+
